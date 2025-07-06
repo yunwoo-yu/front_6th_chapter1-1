@@ -2,6 +2,7 @@ import { getProducts } from "../api/productApi";
 import { main, mainState, searchParams } from "../main";
 import { MainPage } from "../pages/MainPage/MainPage";
 import { render } from "./renderer";
+import { addToCart } from "./cart";
 
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
@@ -18,13 +19,10 @@ const handleLimitChange = async (value) => {
 
   render(MainPage(mainState));
 
+  resetFormValues();
+  // limit은 현재 선택한 값으로 설정
   const limitSelect = document.getElementById("limit-select");
-  const sortSelect = document.getElementById("sort-select");
-  const searchInput = document.getElementById("search-input");
-
-  limitSelect.value = value;
-  sortSelect.value = searchParams.get("sort") || "price_asc";
-  searchInput.value = searchParams.get("search") || "";
+  if (limitSelect) limitSelect.value = value;
 };
 
 // 정렬 변경 이벤트 핸들러
@@ -42,13 +40,10 @@ const handleSortChange = async (value) => {
 
   render(MainPage(mainState));
 
-  const limitSelect = document.getElementById("limit-select");
+  resetFormValues();
+  // sort는 현재 선택한 값으로 설정
   const sortSelect = document.getElementById("sort-select");
-  const searchInput = document.getElementById("search-input");
-
-  limitSelect.value = searchParams.get("limit") || "20";
-  sortSelect.value = value;
-  searchInput.value = searchParams.get("search") || "";
+  if (sortSelect) sortSelect.value = value;
 };
 
 const handleSearchChange = async (value) => {
@@ -66,14 +61,21 @@ const handleSearchChange = async (value) => {
 
   render(MainPage(mainState));
 
-  // 렌더링 후 모든 폼 값들을 다시 설정
+  resetFormValues();
+  // search는 현재 입력한 값으로 설정
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) searchInput.value = value;
+};
+
+// 렌더링 후 폼 값 재설정 공통 함수
+const resetFormValues = () => {
   const limitSelect = document.getElementById("limit-select");
   const sortSelect = document.getElementById("sort-select");
   const searchInput = document.getElementById("search-input");
 
-  limitSelect.value = searchParams.get("limit") || "20";
-  sortSelect.value = searchParams.get("sort") || "price_asc";
-  searchInput.value = value;
+  if (limitSelect) limitSelect.value = searchParams.get("limit") || "20";
+  if (sortSelect) sortSelect.value = searchParams.get("sort") || "price_asc";
+  if (searchInput) searchInput.value = searchParams.get("search") || "";
 };
 
 // 무한 스크롤 이벤트 핸들러
@@ -127,6 +129,27 @@ export const initEventListeners = () => {
       const value = e.target.value;
 
       await handleSearchChange(value);
+    }
+  });
+
+  // 장바구니 담기 버튼 클릭 이벤트
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("add-to-cart-btn")) {
+      const productId = e.target.dataset.productId;
+      const product = mainState.products.find((product) => product.productId === productId);
+
+      if (product) {
+        addToCart(product);
+        mainState.toastType = "success";
+        render(MainPage(mainState));
+        resetFormValues();
+      }
+    }
+
+    if (e.target.closest("#toast-close-btn")) {
+      mainState.toastType = null;
+      render(MainPage(mainState));
+      resetFormValues();
     }
   });
 

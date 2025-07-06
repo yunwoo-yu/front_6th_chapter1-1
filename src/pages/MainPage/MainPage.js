@@ -1,5 +1,7 @@
 import { Footer } from "../../components/layout/Footer";
 import { Header } from "../../components/layout/Header";
+import { Toast } from "../../components/layout/Toast";
+
 import { CategorySection } from "./components/CategorySection";
 import { FilterSection } from "./components/FilterSection";
 import { ProductSection } from "./components/ProductSection";
@@ -26,7 +28,7 @@ export const MainPage = () => {
           <div>${ProductSection()}</div>
         </div>
       </main>
-      ${Footer()}
+      ${Footer()} ${Toast()}
     </div>
   `;
 };

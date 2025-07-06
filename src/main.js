@@ -20,6 +20,7 @@ export let mainState = {
   page: 1,
   hasNext: null,
   categories: {},
+  toastType: null,
 };
 
 export async function main() {
@@ -37,7 +38,9 @@ export async function main() {
   mainState.isInfiniteLoading = false;
   mainState.total = 0;
   mainState.page = 1;
+  mainState.hasNext = null;
   mainState.categories = {};
+  mainState.toastType = null;
 
   render(MainPage(mainState));
 
