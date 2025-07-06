@@ -11,14 +11,20 @@ const handleLimitChange = async (value) => {
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
+
   mainState.products = data.products;
   mainState.page = data.pagination.page;
   mainState.hasNext = data.pagination.hasNext;
 
   render(MainPage(mainState));
 
-  const select = document.getElementById("limit-select");
-  select.value = value;
+  const limitSelect = document.getElementById("limit-select");
+  const sortSelect = document.getElementById("sort-select");
+  const searchInput = document.getElementById("search-input");
+
+  limitSelect.value = value;
+  sortSelect.value = searchParams.get("sort") || "price_asc";
+  searchInput.value = searchParams.get("search") || "";
 };
 
 // 정렬 변경 이벤트 핸들러
@@ -29,14 +35,45 @@ const handleSortChange = async (value) => {
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
+
   mainState.products = data.products;
   mainState.page = data.pagination.page;
   mainState.hasNext = data.pagination.hasNext;
 
   render(MainPage(mainState));
 
-  const select = document.getElementById("sort-select");
-  select.value = value;
+  const limitSelect = document.getElementById("limit-select");
+  const sortSelect = document.getElementById("sort-select");
+  const searchInput = document.getElementById("search-input");
+
+  limitSelect.value = searchParams.get("limit") || "20";
+  sortSelect.value = value;
+  searchInput.value = searchParams.get("search") || "";
+};
+
+const handleSearchChange = async (value) => {
+  searchParams.set("search", value);
+  searchParams.set("page", "1");
+  window.history.pushState({}, "", `?${searchParams.toString()}`);
+
+  const paramsObject = Object.fromEntries(searchParams);
+  const data = await getProducts(paramsObject);
+
+  mainState.products = data.products;
+  mainState.page = data.pagination.page;
+  mainState.hasNext = data.pagination.hasNext;
+  mainState.total = data.pagination.total;
+
+  render(MainPage(mainState));
+
+  // 렌더링 후 모든 폼 값들을 다시 설정
+  const limitSelect = document.getElementById("limit-select");
+  const sortSelect = document.getElementById("sort-select");
+  const searchInput = document.getElementById("search-input");
+
+  limitSelect.value = searchParams.get("limit") || "20";
+  sortSelect.value = searchParams.get("sort") || "price_asc";
+  searchInput.value = value;
 };
 
 // 무한 스크롤 이벤트 핸들러
@@ -47,7 +84,6 @@ const handleInfiniteScroll = async () => {
   mainState.isInfiniteLoading = true;
   render(MainPage(mainState));
 
-  // 현재 페이지 + 1로 설정
   const nextPage = mainState.page + 1;
 
   searchParams.set("page", nextPage.toString());
@@ -64,6 +100,7 @@ const handleInfiniteScroll = async () => {
   mainState.isInfiniteLoading = false;
   render(MainPage(mainState));
 };
+
 let isListenerSet = false;
 let isScrolling = false;
 
@@ -81,6 +118,15 @@ export const initEventListeners = () => {
       const value = e.target.value;
 
       await handleSortChange(value);
+    }
+  });
+
+  // Enter 키를 눌렀을 때 검색 실행
+  document.addEventListener("keydown", async (e) => {
+    if (e.target.id === "search-input" && e.key === "Enter") {
+      const value = e.target.value;
+
+      await handleSearchChange(value);
     }
   });
 

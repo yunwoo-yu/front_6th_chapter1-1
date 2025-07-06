@@ -26,7 +26,7 @@ export async function main() {
   initEventListeners();
   searchParams = new URLSearchParams(window.location.search);
 
-  // 새로고침 시 page 파라미터만 제거
+  // 새로고침 시 제거
   if (searchParams.has("page")) {
     searchParams.delete("page");
     window.history.replaceState({}, "", `?${searchParams.toString()}`);
@@ -59,9 +59,11 @@ export async function main() {
 
   const limitSelect = document.getElementById("limit-select");
   const sortSelect = document.getElementById("sort-select");
+  const searchInput = document.getElementById("search-input");
 
   limitSelect.value = searchParams.get("limit") || "20";
   sortSelect.value = searchParams.get("sort") || "price_asc";
+  searchInput.value = searchParams.get("search") || "";
 }
 
 // 애플리케이션 시작
