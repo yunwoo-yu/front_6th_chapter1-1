@@ -1,3 +1,3 @@
 export const render = (component) => {
-  document.querySelector("#root").innerHTML = component;
+  document.body.querySelector("#root").innerHTML = component;
 };
