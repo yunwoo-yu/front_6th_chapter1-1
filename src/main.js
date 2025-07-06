@@ -1,5 +1,6 @@
 import { getCategories, getProducts } from "./api/productApi.js";
 import { MainPage } from "./pages/MainPage/MainPage.js";
+
 import { render } from "./utils/renderer.js";
 
 const enableMocking = () =>
@@ -9,26 +10,42 @@ const enableMocking = () =>
     }),
   );
 
-const mainState = {
+export const searchParams = new URLSearchParams();
+
+export const mainState = {
   products: [],
-  isLoading: true, // ✅ 초기값 true로 변경
+  isLoading: true,
   total: 0,
-  categories: {}, // ✅ 초기값 추가
+  categories: {},
 };
 
+// const setUpEventListeners = () => {
+//   document.addEventListener("change", (e) => {
+//     if (e.target.id === "limit-select") {
+//       const limit = searchParams.get("limit");
+
+//       if (!limit) {
+//         searchParams.append("limit", e.target.value);
+//       } else {
+//         searchParams.set("limit", e.target.value);
+//       }
+
+//       window.history.pushState({}, "", `?${searchParams.toString()}`);
+//     }
+//   });
+// };
+
 async function main() {
-  // 초기 로딩 상태 렌더링
   render(MainPage(mainState));
+  // setUpEventListeners();
 
-  const [productsData, categoriesData] = await Promise.all([getProducts(), getCategories()]);
+  const [productsData, categoriesData] = await Promise.all([getProducts(searchParams), getCategories()]);
 
-  // 데이터 로딩 완료 후 상태 업데이트
   mainState.products = productsData.products;
   mainState.total = productsData.pagination.total;
   mainState.categories = categoriesData;
   mainState.isLoading = false;
 
-  // 최종 렌더링
   render(MainPage(mainState));
 }
 
