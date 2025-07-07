@@ -1,7 +1,7 @@
 import { getCategories, getProducts } from "./api/productApi.js";
+import { initRootRenderer, update } from "./core/renderer.js";
 import { MainPage } from "./pages/MainPage/MainPage.js";
 import { initEventListeners } from "./utils/events.js";
-import { updateWithState } from "./utils/renderer.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -25,43 +25,36 @@ export let mainState = {
   category2: "",
 };
 
-let isMainRunning = false;
-
-export async function main() {
-  if (isMainRunning) {
-    return;
-  }
-
-  isMainRunning = true;
-
-  initEventListeners();
+// 메인 페이지 초기화 함수
+async function initMainPage() {
+  // mainState 완전 초기화
+  mainState.products = [];
+  mainState.isLoading = true;
+  mainState.isInfiniteLoading = false;
+  mainState.total = 0;
+  mainState.page = 1;
+  mainState.hasNext = null;
+  mainState.categories = {};
+  mainState.toastType = null;
+  mainState.category1 = "";
+  mainState.category2 = "";
 
   searchParams = new URLSearchParams(window.location.search);
-
-  const category1FromUrl = searchParams.get("category1") || "";
-  const category2FromUrl = searchParams.get("category2") || "";
-
-  mainState = {
-    products: [],
-    isLoading: true,
-    isInfiniteLoading: false,
-    total: 0,
-    page: 1,
-    hasNext: null,
-    categories: {},
-    toastType: null,
-    category1: category1FromUrl,
-    category2: category2FromUrl,
-  };
 
   // 새로고침 시 제거
   if (searchParams.has("page")) {
     searchParams.delete("page");
-    window.history.replaceState({}, "", `?${searchParams.toString()}`);
+    window.history.pushState({}, "", `?${searchParams.toString()}`);
   }
 
-  // 새로운 render 시스템 사용
-  updateWithState(MainPage);
+  const category1FromUrl = searchParams.get("category1") || "";
+  const category2FromUrl = searchParams.get("category2") || "";
+
+  mainState.category1 = category1FromUrl;
+  mainState.category2 = category2FromUrl;
+
+  // 초기 렌더링
+  update(MainPage);
 
   const [productsData, categoriesData] = await Promise.all([
     getProducts(Object.fromEntries(searchParams)),
@@ -77,17 +70,30 @@ export async function main() {
   mainState.category1 = productsData.filters.category1;
   mainState.category2 = productsData.filters.category2;
 
-  // 새로운 render 시스템 사용
-  updateWithState(MainPage);
+  // 다시 렌더링
+  update(MainPage);
 
   // 메인 렌더링 이후 변경해줘야할 부분들
   const limitSelect = document.getElementById("limit-select");
   const sortSelect = document.getElementById("sort-select");
   const searchInput = document.getElementById("search-input");
 
-  limitSelect.value = searchParams.get("limit") || "20";
-  sortSelect.value = searchParams.get("sort") || "price_asc";
-  searchInput.value = searchParams.get("search") || "";
+  if (limitSelect) limitSelect.value = searchParams.get("limit") || "20";
+  if (sortSelect) sortSelect.value = searchParams.get("sort") || "price_asc";
+  if (searchInput) searchInput.value = searchParams.get("search") || "";
+}
+
+let isMainRunning = false;
+
+export async function main() {
+  if (isMainRunning) {
+    return;
+  }
+  isMainRunning = true;
+
+  initRootRenderer();
+  initEventListeners();
+  await initMainPage();
 
   isMainRunning = false;
 }
