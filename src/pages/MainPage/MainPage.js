@@ -1,11 +1,31 @@
 import { Footer } from "../../components/layout/Footer";
 import { Header } from "../../components/layout/Header";
 import { Toast } from "../../components/layout/Toast";
+import { createState, getSearchParams } from "../../utils/store";
 
 import { CategorySection } from "./components/CategorySection";
 import { FilterSection } from "./components/FilterSection";
 import { ProductSection } from "./components/ProductSection";
 import { SearchSection } from "./components/SearchSection";
+
+const MAIN = "MAIN";
+
+export const [getMainState, setMainState] = createState(MAIN, {
+  products: [],
+  isLoading: true,
+  isInfiniteLoading: false,
+  total: 0,
+  page: 1,
+  hasNext: null,
+  categories: {},
+  toastType: null,
+  // 폼 값들을 mainState에 통합
+  limit: getSearchParams().get("limit") || "20",
+  sort: getSearchParams().get("sort") || "price_asc",
+  search: getSearchParams().get("search") || "",
+  category1: getSearchParams().get("category1") || "",
+  category2: getSearchParams().get("category2") || "",
+});
 
 export const MainPage = () => {
   return /* HTML */ `

@@ -1,165 +1,231 @@
 import { getProducts } from "../api/productApi";
-import { main, mainState, searchParams } from "../main";
 import { MainPage } from "../pages/MainPage/MainPage";
 import { addToCart } from "./cart";
 import { update } from "../core/renderer";
+import { getMainState, setMainState } from "../pages/MainPage/MainPage";
+import { getSearchParams, setSearchParams } from "./store";
+import { router } from "../main";
 
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
+  // mainState 업데이트
+  setMainState({
+    ...mainState,
+    limit: value,
+    page: 1,
+  });
+
+  // URL 업데이트
   searchParams.set("limit", value);
   searchParams.set("page", "1");
-  window.history.pushState({}, "", `?${searchParams.toString()}`);
+  setSearchParams(searchParams);
+  router.navigate(`?${searchParams.toString()}`);
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
 
-  mainState.products = data.products;
-  mainState.page = data.pagination.page;
-  mainState.hasNext = data.pagination.hasNext;
-
-  resetFormValues();
-  // limit은 현재 선택한 값으로 설정
-  const limitSelect = document.getElementById("limit-select");
-  if (limitSelect) limitSelect.value = value;
+  setMainState({
+    ...mainState,
+    products: data.products,
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    limit: value,
+  });
 };
 
 // 정렬 변경 이벤트 핸들러
 const handleSortChange = async (value) => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
+  // mainState 업데이트
+  setMainState({
+    ...mainState,
+    sort: value,
+    page: 1,
+  });
+
+  // URL 업데이트
   searchParams.set("sort", value);
   searchParams.set("page", "1");
-  window.history.pushState({}, "", `?${searchParams.toString()}`);
+  setSearchParams(searchParams);
+  router.navigate(`?${searchParams.toString()}`);
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
 
-  mainState.products = data.products;
-  mainState.page = data.pagination.page;
-  mainState.hasNext = data.pagination.hasNext;
-
-  resetFormValues();
-  // sort는 현재 선택한 값으로 설정
-  const sortSelect = document.getElementById("sort-select");
-  if (sortSelect) sortSelect.value = value;
+  setMainState({
+    ...mainState,
+    products: data.products,
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    sort: value,
+  });
 };
 
 // 검색 이벤트 핸들러
 const handleSearchChange = async (value) => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
+  // mainState 업데이트
+  setMainState({
+    ...mainState,
+    search: value,
+    page: 1,
+  });
+
+  // URL 업데이트
   searchParams.set("search", value);
   searchParams.set("page", "1");
-  window.history.pushState({}, "", `?${searchParams.toString()}`);
+  setSearchParams(searchParams);
+  router.navigate(`?${searchParams.toString()}`);
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
 
-  mainState.products = data.products;
-  mainState.page = data.pagination.page;
-  mainState.hasNext = data.pagination.hasNext;
-  mainState.total = data.pagination.total;
-
-  resetFormValues();
-  // search는 현재 입력한 값으로 설정
-  const searchInput = document.getElementById("search-input");
-  if (searchInput) searchInput.value = value;
+  setMainState({
+    ...mainState,
+    products: data.products,
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    total: data.pagination.total,
+    search: value,
+  });
 };
 
 // 카테고리 이벤트 핸들러
 const handleCategoryChange = async (value, depth) => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
   if (depth === 1) {
+    setMainState({
+      ...mainState,
+      category1: value,
+      category2: "",
+      page: 1,
+    });
     searchParams.set("category1", value);
-    mainState.category1 = value;
-    // category1이 변경되면 category2는 리셋
     searchParams.delete("category2");
-    mainState.category2 = "";
   } else if (depth === 2) {
+    setMainState({
+      ...mainState,
+      category2: value,
+      page: 1,
+    });
     searchParams.set("category2", value);
-    mainState.category2 = value;
   } else {
+    setMainState({
+      ...mainState,
+      category1: "",
+      category2: "",
+      page: 1,
+    });
     searchParams.delete("category1");
     searchParams.delete("category2");
-    mainState.category1 = "";
-    mainState.category2 = "";
   }
 
   searchParams.set("page", "1");
-  window.history.pushState({}, "", `?${searchParams.toString()}`);
+  setSearchParams(searchParams);
+  router.navigate(`?${searchParams.toString()}`);
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
 
-  mainState.products = data.products;
-  mainState.page = data.pagination.page;
-  mainState.hasNext = data.pagination.hasNext;
-  mainState.total = data.pagination.total;
-  mainState.category1 = data.filters.category1;
-  mainState.category2 = data.filters.category2;
-
-  resetFormValues();
+  setMainState({
+    ...mainState,
+    products: data.products,
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    total: data.pagination.total,
+    category1: data.filters.category1,
+    category2: data.filters.category2,
+  });
 };
 
 // 브레드크럼 클릭 이벤트 핸들러
 const handleBreadcrumbClick = async (type) => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
   if (type === "reset") {
+    setMainState({
+      ...mainState,
+      category1: "",
+      category2: "",
+      page: 1,
+    });
     searchParams.delete("category1");
     searchParams.delete("category2");
-    mainState.category1 = "";
-    mainState.category2 = "";
   } else if (type === "category1") {
+    setMainState({
+      ...mainState,
+      category2: "",
+      page: 1,
+    });
     searchParams.delete("category2");
-    mainState.category2 = "";
   }
 
   searchParams.set("page", "1");
-  window.history.pushState({}, "", `?${searchParams.toString()}`);
+  setSearchParams(searchParams);
+  router.navigate(`?${searchParams.toString()}`);
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
 
-  mainState.products = data.products;
-  mainState.page = data.pagination.page;
-  mainState.hasNext = data.pagination.hasNext;
-  mainState.total = data.pagination.total;
-  mainState.category1 = data.filters.category1;
-  mainState.category2 = data.filters.category2;
-  // categories는 유지
-
-  resetFormValues();
+  setMainState({
+    ...mainState,
+    products: data.products,
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    total: data.pagination.total,
+    category1: data.filters.category1,
+    category2: data.filters.category2,
+    // categories는 유지
+  });
 };
 
 // 무한 스크롤 이벤트 핸들러
 const handleInfiniteScroll = async () => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
   // 이미 로딩 중이거나 다음 페이지가 없으면 리턴
   if (mainState.isInfiniteLoading || !mainState.hasNext) return;
 
-  mainState.isInfiniteLoading = true;
+  // 로딩 상태 시작
+  setMainState({
+    ...mainState,
+    isInfiniteLoading: true,
+  });
   update(MainPage);
 
   const nextPage = mainState.page + 1;
 
+  // URL 업데이트 (무한스크롤은 replaceState 사용)
   searchParams.set("page", nextPage.toString());
-  window.history.pushState({}, "", `?${searchParams.toString()}`);
+  setSearchParams(searchParams);
+  router.navigate(`?${searchParams.toString()}`, { replace: true });
 
   const paramsObject = Object.fromEntries(searchParams);
   const data = await getProducts(paramsObject);
 
-  // 기존 상품들에 새로운 상품들을 추가
-  mainState.products = [...mainState.products, ...data.products];
-  mainState.page = data.pagination.page;
-  mainState.hasNext = data.pagination.hasNext;
-
-  mainState.isInfiniteLoading = false;
+  // 기존 상품들에 새로운 상품들을 추가하고 로딩 상태 종료
+  setMainState({
+    ...mainState,
+    products: [...mainState.products, ...data.products],
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    isInfiniteLoading: false,
+  });
   update(MainPage);
 };
 
-// 렌더링 후 폼 값 재설정 공통 함수
-const resetFormValues = () => {
-  const limitSelect = document.getElementById("limit-select");
-  const sortSelect = document.getElementById("sort-select");
-  const searchInput = document.getElementById("search-input");
-
-  if (limitSelect) limitSelect.value = searchParams.get("limit") || "20";
-  if (sortSelect) sortSelect.value = searchParams.get("sort") || "price_asc";
-  if (searchInput) searchInput.value = searchParams.get("search") || "";
-};
+// resetFormValues는 콜백 시스템으로 대체되어 제거됨
 
 let isListenerSet = false;
 let isScrolling = false;
@@ -176,7 +242,7 @@ const handleChange = async (e) => {
     await handleSortChange(value);
   }
 
-  // 변경 후 한 번만 업데이트
+  // 변경 후 업데이트
   update(MainPage);
 };
 
@@ -184,7 +250,7 @@ const handleKeydown = async (e) => {
   if (e.target.id === "search-input" && e.key === "Enter") {
     const value = e.target.value;
     await handleSearchChange(value);
-    // 검색 후 한 번만 업데이트
+    // 검색 후 업데이트
     update(MainPage);
   }
 };
@@ -194,19 +260,25 @@ const handleClick = async (e) => {
 
   if (e.target.classList.contains("add-to-cart-btn")) {
     const productId = e.target.dataset.productId;
+    const mainState = getMainState();
     const product = mainState.products.find((product) => product.productId === productId);
 
     if (product) {
       addToCart(product);
-      mainState.toastType = "success";
-      resetFormValues();
+      setMainState({
+        ...mainState,
+        toastType: "success",
+      });
       shouldUpdate = true;
     }
   }
 
   if (e.target.closest("#toast-close-btn")) {
-    mainState.toastType = null;
-    resetFormValues();
+    const mainState = getMainState();
+    setMainState({
+      ...mainState,
+      toastType: null,
+    });
     shouldUpdate = true;
   }
 
@@ -224,13 +296,15 @@ const handleClick = async (e) => {
     shouldUpdate = true;
   }
 
-  // 클릭 이벤트 처리 후 한 번만 업데이트
+  // 클릭 이벤트 처리 후 업데이트
   if (shouldUpdate) {
     update(MainPage);
   }
 };
 
 const handleScroll = async (e) => {
+  const mainState = getMainState();
+
   // 이미 스크롤 처리 중이거나 다음 페이지가 없으면 리턴
   if (isScrolling || !mainState.hasNext) return;
 
@@ -246,9 +320,7 @@ const handleScroll = async (e) => {
   }
 };
 
-const handlePopState = () => {
-  main();
-};
+// handlePopState는 router에서 처리하도록 제거
 
 export const initEventListeners = () => {
   if (isListenerSet) return;
@@ -258,14 +330,12 @@ export const initEventListeners = () => {
   document.removeEventListener("keydown", handleKeydown);
   document.removeEventListener("click", handleClick);
   window.removeEventListener("scroll", handleScroll);
-  window.removeEventListener("popstate", handlePopState);
 
-  // 새 이벤트 리스너 등록
+  // 새 이벤트 리스너 등록 (popstate는 router에서 처리)
   document.addEventListener("change", handleChange);
   document.addEventListener("keydown", handleKeydown);
   document.addEventListener("click", handleClick);
   window.addEventListener("scroll", handleScroll);
-  window.addEventListener("popstate", handlePopState);
 
   isListenerSet = true;
 };

@@ -1,8 +1,10 @@
 import { ProductItem } from "../../../features/products/ProductItem";
 import { ProductItemSkeleton } from "../../../features/products/ProductItemSkeleton";
-import { mainState } from "../../../main";
+import { getMainState } from "../MainPage";
 
 export const ProductSection = () => {
+  const mainState = getMainState();
+
   return /* HTML */ `
     <!-- 상품 개수 정보 -->
     ${mainState.isLoading

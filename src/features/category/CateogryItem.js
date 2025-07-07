@@ -1,6 +1,8 @@
-import { mainState } from "../../main";
+import { getMainState } from "../../pages/MainPage/MainPage";
 
 export const CategoryItem = ({ category, depth }) => {
+  const mainState = getMainState();
+
   return /* HTML */ `
     ${depth === 1
       ? /* HTML */ `

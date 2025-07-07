@@ -8,7 +8,7 @@ export const initRootRenderer = (id = "root") => {
   }
 };
 
-export const update = (component) => {
+export const update = (component, onAfterRender) => {
   if (!root) {
     console.error("Root element not found");
     return;
@@ -17,11 +17,10 @@ export const update = (component) => {
   const targetComponent = component();
 
   root.innerHTML = targetComponent;
-  root.offsetHeight;
-};
+  root.offsetHeight; // DOM 강제 리플로우
 
-export const rootClear = () => {
-  if (root) {
-    root.innerHTML = "";
+  // 렌더링 완료 후 콜백 실행
+  if (onAfterRender) {
+    onAfterRender();
   }
 };

@@ -1,7 +1,10 @@
 import { getCategories, getProducts } from "./api/productApi.js";
 import { initRootRenderer, update } from "./core/renderer.js";
+import { createRouter } from "./core/router.js";
 import { MainPage } from "./pages/MainPage/MainPage.js";
 import { initEventListeners } from "./utils/events.js";
+import { setMainState } from "./pages/MainPage/MainPage.js";
+import { setSearchParams } from "./utils/store.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -10,48 +13,41 @@ const enableMocking = () =>
     }),
   );
 
-export let searchParams = new URLSearchParams(window.location.search);
-
-export let mainState = {
-  products: [],
-  isLoading: true,
-  isInfiniteLoading: false,
-  total: 0,
-  page: 1,
-  hasNext: null,
-  categories: {},
-  toastType: null,
-  category1: "",
-  category2: "",
-};
-
 // 메인 페이지 초기화 함수
 async function initMainPage() {
-  // mainState 완전 초기화
-  mainState.products = [];
-  mainState.isLoading = true;
-  mainState.isInfiniteLoading = false;
-  mainState.total = 0;
-  mainState.page = 1;
-  mainState.hasNext = null;
-  mainState.categories = {};
-  mainState.toastType = null;
-  mainState.category1 = "";
-  mainState.category2 = "";
+  const searchParams = new URLSearchParams(window.location.search);
+  setSearchParams(searchParams);
 
-  searchParams = new URLSearchParams(window.location.search);
-
-  // 새로고침 시 제거
+  // 새로고침 시 page 파라미터 제거 (replaceState 사용)
   if (searchParams.has("page")) {
     searchParams.delete("page");
-    window.history.pushState({}, "", `?${searchParams.toString()}`);
+    setSearchParams(searchParams);
+    router.navigate(`?${searchParams.toString()}`, { replace: true });
   }
 
+  // URL에서 폼 값들 가져오기
   const category1FromUrl = searchParams.get("category1") || "";
   const category2FromUrl = searchParams.get("category2") || "";
+  const limitFromUrl = searchParams.get("limit") || "20";
+  const sortFromUrl = searchParams.get("sort") || "price_asc";
+  const searchFromUrl = searchParams.get("search") || "";
 
-  mainState.category1 = category1FromUrl;
-  mainState.category2 = category2FromUrl;
+  // mainState 완전 초기화
+  setMainState({
+    products: [],
+    isLoading: true,
+    isInfiniteLoading: false,
+    total: 0,
+    page: 1,
+    hasNext: null,
+    categories: {},
+    toastType: null,
+    category1: category1FromUrl,
+    category2: category2FromUrl,
+    limit: limitFromUrl,
+    sort: sortFromUrl,
+    search: searchFromUrl,
+  });
 
   // 초기 렌더링
   update(MainPage);
@@ -61,29 +57,39 @@ async function initMainPage() {
     getCategories(),
   ]);
 
-  mainState.products = productsData.products;
-  mainState.total = productsData.pagination.total;
-  mainState.categories = categoriesData;
-  mainState.isLoading = false;
-  mainState.hasNext = productsData.pagination.hasNext;
-  mainState.page = productsData.pagination.page;
-  mainState.category1 = productsData.filters.category1;
-  mainState.category2 = productsData.filters.category2;
+  // API 응답 데이터로 store 업데이트
+  setMainState((prevState) => ({
+    ...prevState,
+    products: productsData.products,
+    total: productsData.pagination.total,
+    categories: categoriesData,
+    isLoading: false,
+    hasNext: productsData.pagination.hasNext,
+    page: productsData.pagination.page,
+    category1: productsData.filters.category1,
+    category2: productsData.filters.category2,
+  }));
 
-  // 다시 렌더링
+  // 최종 렌더링
   update(MainPage);
-
-  // 메인 렌더링 이후 변경해줘야할 부분들
-  const limitSelect = document.getElementById("limit-select");
-  const sortSelect = document.getElementById("sort-select");
-  const searchInput = document.getElementById("search-input");
-
-  if (limitSelect) limitSelect.value = searchParams.get("limit") || "20";
-  if (sortSelect) sortSelect.value = searchParams.get("sort") || "price_asc";
-  if (searchInput) searchInput.value = searchParams.get("search") || "";
 }
 
 let isMainRunning = false;
+
+// 라우트 정의
+const routes = [
+  {
+    path: "/",
+    component: MainPage,
+  },
+  // 상세페이지 라우트도 나중에 추가할 수 있음
+  // {
+  //   path: "/product/:id",
+  //   component: ProductDetailPage,
+  // },
+];
+
+export const router = createRouter(routes);
 
 export async function main() {
   if (isMainRunning) {
@@ -93,6 +99,7 @@ export async function main() {
 
   initRootRenderer();
   initEventListeners();
+  router.init(main);
   await initMainPage();
 
   isMainRunning = false;
