@@ -1,6 +1,9 @@
+import { getCategories, getProducts } from "../../api/productApi";
 import { Footer } from "../../components/layout/Footer";
 import { Header } from "../../components/layout/Header";
 import { Toast } from "../../components/layout/Toast";
+import { update } from "../../core/renderer";
+import { Cart } from "../../features/cart/Cart";
 import { createState, getSearchParams } from "../../utils/store";
 
 import { CategorySection } from "./components/CategorySection";
@@ -19,7 +22,6 @@ export const [getMainState, setMainState] = createState(MAIN, {
   hasNext: null,
   categories: {},
   toastType: null,
-  // 폼 값들을 mainState에 통합
   limit: getSearchParams().get("limit") || "20",
   sort: getSearchParams().get("sort") || "price_asc",
   search: getSearchParams().get("search") || "",
@@ -48,7 +50,62 @@ export const MainPage = () => {
           <div>${ProductSection()}</div>
         </div>
       </main>
-      ${Footer()} ${Toast()}
+      ${Footer()} ${Toast()} ${Cart()}
     </div>
   `;
 };
+
+// 컴포넌트 라이프사이클 메서드들
+MainPage.onMount = async () => {
+  const searchParams = getSearchParams();
+
+  // URL에서 폼 값들 가져오기
+  const category1FromUrl = searchParams.get("category1") || "";
+  const category2FromUrl = searchParams.get("category2") || "";
+  const limitFromUrl = searchParams.get("limit") || "20";
+  const sortFromUrl = searchParams.get("sort") || "price_asc";
+  const searchFromUrl = searchParams.get("search") || "";
+
+  // mainState 완전 초기화
+  setMainState({
+    products: [],
+    isLoading: true,
+    isInfiniteLoading: false,
+    total: 0,
+    page: 1,
+    hasNext: null,
+    categories: {},
+    toastType: null,
+    category1: category1FromUrl,
+    category2: category2FromUrl,
+    limit: limitFromUrl,
+    sort: sortFromUrl,
+    search: searchFromUrl,
+  });
+
+  // 초기 렌더링
+  update(MainPage);
+
+  const [productsData, categoriesData] = await Promise.all([
+    getProducts(Object.fromEntries(searchParams)),
+    getCategories(),
+  ]);
+
+  // API 응답 데이터로 store 업데이트
+  setMainState((prevState) => ({
+    ...prevState,
+    products: productsData.products,
+    total: productsData.pagination.total,
+    categories: categoriesData,
+    isLoading: false,
+    hasNext: productsData.pagination.hasNext,
+    page: productsData.pagination.page,
+    category1: productsData.filters.category1,
+    category2: productsData.filters.category2,
+  }));
+
+  // 최종 렌더링
+  update(MainPage);
+};
+
+MainPage.onUnmount = () => {};

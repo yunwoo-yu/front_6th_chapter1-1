@@ -1,10 +1,12 @@
 import { getProducts } from "../api/productApi";
 import { MainPage } from "../pages/MainPage/MainPage";
-import { addToCart } from "./cart";
 import { update } from "../core/renderer";
+
 import { getMainState, setMainState } from "../pages/MainPage/MainPage";
 import { getSearchParams, setSearchParams } from "./store";
 import { router } from "../main";
+import { toggleSelectAll, updateCartItemSelection, updateCartQuantity, addToCart } from "./carts";
+import { cartState } from "../features/cart/Cart";
 
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
@@ -253,6 +255,13 @@ const handleKeydown = async (e) => {
     // 검색 후 업데이트
     update(MainPage);
   }
+
+  if (e.key === "Escape") {
+    if (cartState.isOpen) {
+      cartState.isOpen = false;
+      update(MainPage);
+    }
+  }
 };
 
 const handleClick = async (e) => {
@@ -293,6 +302,72 @@ const handleClick = async (e) => {
 
   if (e.target.dataset.breadcrumb) {
     await handleBreadcrumbClick(e.target.dataset.breadcrumb);
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest("#cart-icon-btn")) {
+    cartState.isOpen = true;
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest("#cart-modal-close-btn")) {
+    cartState.isOpen = false;
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest(".quantity-decrease-btn")) {
+    const productId = e.target.closest(".quantity-decrease-btn").dataset.productId;
+    const newCartItems = updateCartQuantity(productId, "decrease");
+
+    // 즉시 DOM 업데이트
+    const quantityInput = document.querySelector(`[data-product-id="${productId}"].quantity-input`);
+    if (quantityInput && newCartItems) {
+      const updatedItem = newCartItems.find((item) => item.productId === productId);
+      if (updatedItem) {
+        quantityInput.value = updatedItem.quantity;
+      }
+    }
+
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest(".quantity-increase-btn")) {
+    const productId = e.target.closest(".quantity-increase-btn").dataset.productId;
+    const newCartItems = updateCartQuantity(productId, "increase");
+
+    // 즉시 DOM 업데이트
+    const quantityInput = document.querySelector(`[data-product-id="${productId}"].quantity-input`);
+    if (quantityInput && newCartItems) {
+      const updatedItem = newCartItems.find((item) => item.productId === productId);
+      if (updatedItem) {
+        quantityInput.value = updatedItem.quantity;
+      }
+    }
+
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest(".cart-modal-overlay") && !e.target.closest("[data-modal-content]")) {
+    cartState.isOpen = false;
+    shouldUpdate = true;
+  }
+
+  if (e.target.classList.contains("cart-item-checkbox")) {
+    const productId = e.target.dataset.productId;
+    const isSelected = e.target.checked;
+
+    // localStorage 업데이트
+    updateCartItemSelection(productId, isSelected);
+
+    shouldUpdate = true;
+  }
+
+  if (e.target.id === "cart-modal-select-all-checkbox") {
+    const isSelected = e.target.checked;
+
+    // localStorage 업데이트
+    toggleSelectAll(isSelected);
+
     shouldUpdate = true;
   }
 

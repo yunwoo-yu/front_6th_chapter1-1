@@ -1,4 +1,4 @@
-import { getCartItemCount } from "../../utils/cart";
+import { getCartItemCount } from "../../utils/carts";
 
 export const Header = () => /* HTML */ `
   <header class="bg-white shadow-sm sticky top-0 z-40">
