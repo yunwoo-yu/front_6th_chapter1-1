@@ -1,12 +1,20 @@
 import { getProducts } from "../api/productApi";
-import { MainPage } from "../pages/MainPage/MainPage";
 import { update } from "../core/renderer";
+import { MainPage } from "../pages/MainPage/MainPage";
 
-import { getMainState, setMainState } from "../pages/MainPage/MainPage";
-import { getSearchParams, setSearchParams } from "./store";
-import { router } from "../main";
-import { toggleSelectAll, updateCartItemSelection, updateCartQuantity, addToCart } from "./carts";
 import { cartState } from "../features/cart/Cart";
+import { router } from "../main";
+import { getMainState, setMainState } from "../pages/MainPage/MainPage";
+import {
+  addToCart,
+  clearCart,
+  removeCartItem,
+  removeSelectedCartItems,
+  toggleSelectAll,
+  updateCartItemSelection,
+  updateCartQuantity,
+} from "./carts";
+import { getSearchParams, setSearchParams } from "./store";
 
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
@@ -349,6 +357,24 @@ const handleClick = async (e) => {
 
   if (e.target.closest(".cart-modal-overlay") && !e.target.closest("[data-modal-content]")) {
     cartState.isOpen = false;
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest(".cart-item-remove-btn")) {
+    const productId = e.target.closest(".cart-item-remove-btn").dataset.productId;
+
+    removeCartItem(productId);
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest("#cart-modal-remove-selected-btn")) {
+    removeSelectedCartItems();
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest("#cart-modal-clear-cart-btn")) {
+    clearCart();
+
     shouldUpdate = true;
   }
 

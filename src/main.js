@@ -45,7 +45,7 @@ export async function main() {
   if (searchParams.has("page")) {
     searchParams.delete("page");
     setSearchParams(searchParams);
-    await router.navigate(`?${searchParams.toString()}`, { replace: true });
+    router.navigate(`?${searchParams.toString()}`, { replace: true });
   }
 
   const currentPath = router.getCurrentPath();

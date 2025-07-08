@@ -16,7 +16,7 @@ export const Cart = () => {
       class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-black bg-opacity-50 z-50 cart-modal-overlay"
     >
       ${!cartItems.length
-        ? /* HTML */ ` <div class="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        ? /* HTML */ ` <div class="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4 cart-modal">
             <div
               class="relative bg-white rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-hidden"
               data-modal-content
@@ -69,7 +69,7 @@ export const Cart = () => {
               </div>
             </div>
           </div>`
-        : /* HTML */ `<div class="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        : /* HTML */ `<div class="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4 cart-modal">
             <div
               class="relative bg-white rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-hidden"
               data-modal-content
@@ -110,7 +110,7 @@ export const Cart = () => {
                       ${cartItemCount > 0 && cartItems.every((product) => product.isSelected) ? "checked" : ""}
                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2"
                     />
-                    전체선택 (${cartItems.filter((product) => product.isSelected).length}개)
+                    전체선택 (${cartItems.length}개)
                   </label>
                 </div>
                 <!-- 아이템 목록 -->
@@ -147,7 +147,6 @@ export const Cart = () => {
                     <span class="text-lg font-bold text-gray-900">총 금액</span>
                     <span class="text-xl font-bold text-blue-600"
                       >${cartItems
-                        .filter((product) => product.isSelected)
                         .reduce((acc, product) => (acc += Number(product.lprice) * product.quantity), 0)
                         .toLocaleString("ko-KR")}원</span
                     >

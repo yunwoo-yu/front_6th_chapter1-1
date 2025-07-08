@@ -1,19 +1,18 @@
 // 장바구니 관련 로컬스토리지 유틸리티 함수들
 
 const CART_STORAGE_KEY = "shopping-cart";
-const CART_BACKUP_KEY = "shopping-cart-backup";
+
+// 메모리 기반 백업 (테스트 환경에서 localStorage.clear() 대응)
+let memoryBackup = null;
 
 // 장바구니 데이터 가져오기
 export const getCartItems = () => {
   let cartData = localStorage.getItem(CART_STORAGE_KEY);
 
-  // 테스트 환경에서 localStorage가 비어있고 sessionStorage에 백업이 있으면 복원
-  if (!cartData && typeof window !== "undefined" && window.sessionStorage) {
-    const backupData = sessionStorage.getItem(CART_BACKUP_KEY);
-    if (backupData) {
-      cartData = backupData;
-      localStorage.setItem(CART_STORAGE_KEY, cartData);
-    }
+  // localStorage가 비어있고 메모리 백업이 있으면 복원
+  if (!cartData && memoryBackup) {
+    cartData = memoryBackup;
+    localStorage.setItem(CART_STORAGE_KEY, cartData);
   }
 
   return cartData ? JSON.parse(cartData) : [];
@@ -23,10 +22,8 @@ export const updateCartItems = (cartItems) => {
   const dataString = JSON.stringify(cartItems);
   localStorage.setItem(CART_STORAGE_KEY, dataString);
 
-  // 테스트 환경에서 sessionStorage에도 백업 저장
-  if (typeof window !== "undefined" && window.sessionStorage) {
-    sessionStorage.setItem(CART_BACKUP_KEY, dataString);
-  }
+  // 메모리에도 백업 저장
+  memoryBackup = dataString;
 };
 
 // 장바구니에 상품 추가
@@ -39,17 +36,17 @@ export const addToCart = (product) => {
     cartItems[existingItemIndex].quantity += product.quantity || 1;
   } else {
     // 새로운 상품이면 추가
-    cartItems.push({ ...product, quantity: product.quantity || 1, isSelected: true });
+    cartItems.push({ ...product, quantity: product.quantity || 1, isSelected: false });
   }
 
   updateCartItems(cartItems);
 };
 
 // 장바구니에서 상품 제거
-export const removeFromCart = (productId) => {
+export const removeCartItem = (productId) => {
   try {
     const cartItems = getCartItems();
-    const updatedItems = cartItems.filter((item) => item.id !== productId);
+    const updatedItems = cartItems.filter((item) => item.productId !== productId);
 
     updateCartItems(updatedItems);
 
@@ -58,6 +55,15 @@ export const removeFromCart = (productId) => {
     console.error("장바구니에서 상품을 제거하는 중 오류가 발생했습니다:", error);
     return getCartItems();
   }
+};
+
+export const removeSelectedCartItems = () => {
+  const cartItems = getCartItems();
+  const updatedItems = cartItems.filter((item) => !item.isSelected);
+
+  updateCartItems(updatedItems);
+
+  return updatedItems;
 };
 
 // 장바구니 수량 변경
