@@ -1,9 +1,8 @@
 import { getProducts } from "../api/productApi";
-import { update } from "../core/renderer";
-import { MainPage } from "../pages/MainPage/MainPage";
+import { updateCurrent } from "../core/renderer";
 
 import { cartState } from "../features/cart/Cart";
-import { router } from "../main";
+import { router } from "../core/router";
 import { getMainState, setMainState } from "../pages/MainPage/MainPage";
 import {
   addToCart,
@@ -212,7 +211,7 @@ const handleInfiniteScroll = async () => {
     ...mainState,
     isInfiniteLoading: true,
   });
-  update(MainPage);
+  updateCurrent();
 
   const nextPage = mainState.page + 1;
 
@@ -232,7 +231,7 @@ const handleInfiniteScroll = async () => {
     hasNext: data.pagination.hasNext,
     isInfiniteLoading: false,
   });
-  update(MainPage);
+  updateCurrent();
 };
 
 // resetFormValues는 콜백 시스템으로 대체되어 제거됨
@@ -253,7 +252,7 @@ const handleChange = async (e) => {
   }
 
   // 변경 후 업데이트
-  update(MainPage);
+  updateCurrent();
 };
 
 const handleKeydown = async (e) => {
@@ -261,13 +260,13 @@ const handleKeydown = async (e) => {
     const value = e.target.value;
     await handleSearchChange(value);
     // 검색 후 업데이트
-    update(MainPage);
+    updateCurrent();
   }
 
   if (e.key === "Escape") {
     if (cartState.isOpen) {
       cartState.isOpen = false;
-      update(MainPage);
+      updateCurrent();
     }
   }
 };
@@ -397,9 +396,16 @@ const handleClick = async (e) => {
     shouldUpdate = true;
   }
 
+  if (e.target.closest(".product-image") || e.target.closest(".product-info")) {
+    const productId = e.target.closest(".product-card").dataset.productId;
+    router.navigate(`/product/${productId}`);
+
+    shouldUpdate = true;
+  }
+
   // 클릭 이벤트 처리 후 업데이트
   if (shouldUpdate) {
-    update(MainPage);
+    updateCurrent();
   }
 };
 

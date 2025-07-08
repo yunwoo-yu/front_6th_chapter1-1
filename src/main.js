@@ -1,8 +1,7 @@
 import { initRootRenderer } from "./core/renderer.js";
-import { createRouter } from "./core/router.js";
-import { MainPage } from "./pages/MainPage/MainPage.js";
+import { router } from "./core/router.js";
 import { initEventListeners } from "./utils/events.js";
-import { setSearchParams } from "./utils/store.js";
+import { setRouteParams, setSearchParams } from "./utils/store.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -14,18 +13,6 @@ const enableMocking = () =>
 let isMainRunning = false;
 
 // 라우트 정의
-const routes = [
-  {
-    path: "/",
-    component: MainPage,
-  },
-  // {
-  //   path: "/product/:id",
-  //   component: ProductDetailPage,
-  // },
-];
-
-export const router = createRouter(routes);
 
 export async function main() {
   if (isMainRunning) {
@@ -51,9 +38,19 @@ export async function main() {
   const currentPath = router.getCurrentPath();
   const route = router.findRoute(currentPath);
 
-  if (route && route.component.onMount) {
-    // onMount에서 렌더링까지 처리하도록 위임
-    await route.component.onMount();
+  if (route) {
+    // 라우트 파라미터를 store에 저장
+    const params = router.getRouteParams(route.path, currentPath);
+
+    setRouteParams(params);
+
+    // 먼저 navigate로 즉시 렌더링
+    router.navigate(currentPath, { replace: true });
+
+    // 그 다음 onMount 호출
+    if (route.component.onMount) {
+      await route.component.onMount();
+    }
   }
 
   isMainRunning = false;

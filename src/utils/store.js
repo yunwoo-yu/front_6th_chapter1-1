@@ -25,5 +25,8 @@ export const createState = (key, initialValue) => {
 };
 
 export const PARAMS = "PARAMS";
+export const ROUTE_PARAMS = "ROUTE_PARAMS";
 
 export const [getSearchParams, setSearchParams] = createState(PARAMS, new URLSearchParams(window.location.search));
+
+export const [getRouteParams, setRouteParams] = createState(ROUTE_PARAMS, {});

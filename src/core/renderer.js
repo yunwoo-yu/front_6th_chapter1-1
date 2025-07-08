@@ -1,4 +1,5 @@
 let root = null;
+let currentComponent = null;
 
 export const initRootRenderer = (id = "root") => {
   root = document.getElementById(id);
@@ -14,6 +15,9 @@ export const update = (component, onAfterRender) => {
     return;
   }
 
+  // 현재 컴포넌트 저장
+  currentComponent = component;
+
   const targetComponent = component();
 
   root.innerHTML = targetComponent;
@@ -22,5 +26,12 @@ export const update = (component, onAfterRender) => {
   // 렌더링 완료 후 콜백 실행
   if (onAfterRender) {
     onAfterRender();
+  }
+};
+
+// 현재 컴포넌트를 다시 렌더링
+export const updateCurrent = (onAfterRender) => {
+  if (currentComponent) {
+    update(currentComponent, onAfterRender);
   }
 };
