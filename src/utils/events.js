@@ -16,6 +16,9 @@ import {
 } from "./carts";
 import { getSearchParams, setSearchParams } from "./store";
 
+import { getDetailState, setDetailState } from "../pages/ProductDetailPage/ProductDetailPage";
+import { setToastState } from "../components/layout/Toast";
+
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
   const mainState = getMainState();
@@ -336,25 +339,40 @@ const handleClick = async (e) => {
 
   if (e.target.classList.contains("add-to-cart-btn")) {
     const productId = e.target.dataset.productId;
+
     const mainState = getMainState();
     const product = mainState.products.find((product) => product.productId === productId);
 
     if (product) {
       addToCart(product);
-      setMainState({
-        ...mainState,
+      setToastState({
         toastType: "success",
       });
+
+      shouldUpdate = true;
+    }
+  }
+
+  if (e.target.id === "add-to-cart-btn") {
+    const detailState = getDetailState();
+    const product = detailState.product;
+
+    if (product) {
+      addToCart(product, detailState.quantity);
+      setDetailState((prev) => ({ ...prev, quantity: 1 }));
+      setToastState({
+        toastType: "success",
+      });
+
       shouldUpdate = true;
     }
   }
 
   if (e.target.closest("#toast-close-btn")) {
-    const mainState = getMainState();
-    setMainState({
-      ...mainState,
+    setToastState({
       toastType: null,
     });
+
     shouldUpdate = true;
   }
 
@@ -387,6 +405,15 @@ const handleClick = async (e) => {
 
   if (e.target.closest("#cart-modal-close-btn")) {
     cartState.isOpen = false;
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest("#quantity-decrease")) {
+    setDetailState((prev) => ({ ...prev, quantity: prev.quantity - 1 }));
+    shouldUpdate = true;
+  }
+  if (e.target.closest("#quantity-increase")) {
+    setDetailState((prev) => ({ ...prev, quantity: prev.quantity + 1 }));
     shouldUpdate = true;
   }
 
@@ -448,7 +475,22 @@ const handleClick = async (e) => {
   if (e.target.closest(".product-image") || e.target.closest(".product-info")) {
     const productId = e.target.closest(".product-card").dataset.productId;
     router.navigate(`/product/${productId}`);
+    const route = router.findRoute(router.getCurrentPath());
 
+    if (route.component.onMount) {
+      route.component.onMount();
+    }
+    shouldUpdate = true;
+  }
+
+  if (e.target.closest(".related-product-card")) {
+    const productId = e.target.closest(".related-product-card").dataset.productId;
+    router.navigate(`/product/${productId}`);
+    const route = router.findRoute(router.getCurrentPath());
+
+    if (route.component.onMount) {
+      route.component.onMount();
+    }
     shouldUpdate = true;
   }
 

@@ -1,10 +1,24 @@
-import { getMainState } from "../../pages/MainPage/MainPage";
+// import { updateCurrent } from "../../core/renderer";
+import { createState } from "../../utils/store";
+
+const TOAST = "TOAST";
+
+export const [getToastState, setToastState] = createState(TOAST, {
+  toastType: null,
+});
 
 export const Toast = () => {
-  const mainState = getMainState();
+  const toastState = getToastState();
+
+  // if (toastState.toastType) {
+  //   setTimeout(() => {
+  //     setToastState({ toastType: null });
+  //     updateCurrent();
+  //   }, 2000);
+  // }
 
   return /* HTML */ `
-    ${mainState.toastType === "success"
+    ${toastState.toastType === "success"
       ? /* HTML */ `
           <div
             class="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 max-w-sm fixed bottom-3 -translate-x-1/2 left-1/2"
@@ -23,7 +37,7 @@ export const Toast = () => {
           </div>
         `
       : ""}
-    ${mainState.toastType === "delete"
+    ${toastState.toastType === "delete"
       ? /* HTML */ `
           <div class="bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 max-w-sm">
             <div class="flex-shrink-0">
@@ -45,7 +59,7 @@ export const Toast = () => {
           </div>
         `
       : ""}
-    ${mainState.toastType === "error"
+    ${toastState.toastType === "error"
       ? /* HTML */ `
           <div class="bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 max-w-sm">
             <div class="flex-shrink-0">

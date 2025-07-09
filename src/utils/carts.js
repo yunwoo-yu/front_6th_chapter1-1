@@ -1,6 +1,6 @@
 // 장바구니 관련 로컬스토리지 유틸리티 함수들
 
-const CART_STORAGE_KEY = "shopping-cart";
+const CART_STORAGE_KEY = "shopping_cart";
 
 // 장바구니 데이터 가져오기
 export const getCartItems = () => {
@@ -16,7 +16,7 @@ export const updateCartItems = (cartItems) => {
 };
 
 // 장바구니에 상품 추가
-export const addToCart = (product) => {
+export const addToCart = (product, quantity) => {
   const cartItems = getCartItems();
   const existingItemIndex = cartItems.findIndex((item) => item.productId === product.productId);
 
@@ -25,7 +25,7 @@ export const addToCart = (product) => {
     cartItems[existingItemIndex].quantity += product.quantity || 1;
   } else {
     // 새로운 상품이면 추가
-    cartItems.push({ ...product, quantity: product.quantity || 1, isSelected: false });
+    cartItems.push({ ...product, quantity: quantity || 1, isSelected: false });
   }
 
   updateCartItems(cartItems);
