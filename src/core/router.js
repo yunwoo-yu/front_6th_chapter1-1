@@ -1,7 +1,7 @@
-import { update } from "./renderer";
-import { setRouteParams } from "../utils/store";
 import { MainPage } from "../pages/MainPage/MainPage";
 import { ProductDetailPage } from "../pages/ProductDetailPage/ProductDetailPage";
+import { setRouteParams } from "../utils/store";
+import { update } from "./renderer";
 
 export const createRouter = (routes) => {
   let currentRoute = null;
@@ -96,18 +96,12 @@ export const createRouter = (routes) => {
     });
   };
 
-  // 현재 라우트 컴포넌트 가져오기
-  const getCurrentComponent = () => {
-    return currentRoute?.component || null;
-  };
-
   return {
     init,
     navigate,
     findRoute,
     getCurrentPath,
     getRouteParams,
-    getCurrentComponent,
     currentRoute,
   };
 };

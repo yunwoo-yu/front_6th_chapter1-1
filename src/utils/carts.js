@@ -2,28 +2,17 @@
 
 const CART_STORAGE_KEY = "shopping-cart";
 
-// 메모리 기반 백업 (테스트 환경에서 localStorage.clear() 대응)
-let memoryBackup = null;
-
 // 장바구니 데이터 가져오기
 export const getCartItems = () => {
-  let cartData = localStorage.getItem(CART_STORAGE_KEY);
-
-  // localStorage가 비어있고 메모리 백업이 있으면 복원
-  if (!cartData && memoryBackup) {
-    cartData = memoryBackup;
-    localStorage.setItem(CART_STORAGE_KEY, cartData);
-  }
+  const cartData = localStorage.getItem(CART_STORAGE_KEY);
 
   return cartData ? JSON.parse(cartData) : [];
 };
 
 export const updateCartItems = (cartItems) => {
   const dataString = JSON.stringify(cartItems);
-  localStorage.setItem(CART_STORAGE_KEY, dataString);
 
-  // 메모리에도 백업 저장
-  memoryBackup = dataString;
+  localStorage.setItem(CART_STORAGE_KEY, dataString);
 };
 
 // 장바구니에 상품 추가
@@ -71,8 +60,6 @@ export const updateCartQuantity = (productId, type) => {
   try {
     const cartItems = getCartItems();
     const productIndex = cartItems.findIndex((item) => item.productId === productId);
-
-    console.log(cartItems);
 
     if (productIndex === -1) {
       console.error("상품을 찾을 수 없습니다:", productId);

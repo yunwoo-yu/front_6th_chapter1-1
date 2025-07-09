@@ -7,6 +7,7 @@ import { getMainState, setMainState } from "../pages/MainPage/MainPage";
 import {
   addToCart,
   clearCart,
+  getCartItems,
   removeCartItem,
   removeSelectedCartItems,
   toggleSelectAll,
@@ -156,6 +157,48 @@ const handleCategoryChange = async (value, depth) => {
   });
 };
 
+// 브레드크럼 카테고리 설정 함수
+const handleBreadcrumbCategory = async (category1, category2, path = "/") => {
+  const mainState = getMainState();
+  const searchParams = getSearchParams();
+
+  setMainState({
+    ...mainState,
+    category1: category1 || "",
+    category2: category2 || "",
+    page: 1,
+  });
+
+  if (category1) {
+    searchParams.set("category1", category1);
+  } else {
+    searchParams.delete("category1");
+  }
+
+  if (category2) {
+    searchParams.set("category2", category2);
+  } else {
+    searchParams.delete("category2");
+  }
+
+  searchParams.set("page", "1");
+  setSearchParams(searchParams);
+  router.navigate(`${path}?${searchParams.toString()}`);
+
+  const paramsObject = Object.fromEntries(searchParams);
+  const data = await getProducts(paramsObject);
+
+  setMainState({
+    ...mainState,
+    products: data.products,
+    page: data.pagination.page,
+    hasNext: data.pagination.hasNext,
+    total: data.pagination.total,
+    category1: data.filters.category1,
+    category2: data.filters.category2,
+  });
+};
+
 // 브레드크럼 클릭 이벤트 핸들러
 const handleBreadcrumbClick = async (type) => {
   const mainState = getMainState();
@@ -251,6 +294,23 @@ const handleChange = async (e) => {
     await handleSortChange(value);
   }
 
+  if (e.target.closest("#cart-modal-select-all-checkbox")) {
+    const currentItems = getCartItems();
+    const allCurrentlySelected = currentItems.every((item) => item.isSelected);
+    const newSelectionState = !allCurrentlySelected;
+
+    // localStorage 업데이트
+    toggleSelectAll(newSelectionState);
+  }
+
+  if (e.target.classList.contains("cart-item-checkbox")) {
+    const productId = e.target.dataset.productId;
+    const isSelected = e.target.checked;
+
+    // localStorage 업데이트
+    updateCartItemSelection(productId, isSelected);
+  }
+
   // 변경 후 업데이트
   updateCurrent();
 };
@@ -309,6 +369,14 @@ const handleClick = async (e) => {
 
   if (e.target.dataset.breadcrumb) {
     await handleBreadcrumbClick(e.target.dataset.breadcrumb);
+    shouldUpdate = true;
+  }
+
+  if (e.target.classList.contains("breadcrumb-link")) {
+    const category1 = e.target.dataset.category1;
+    const category2 = e.target.dataset.category2;
+
+    await handleBreadcrumbCategory(category1, category2);
     shouldUpdate = true;
   }
 
@@ -377,25 +445,6 @@ const handleClick = async (e) => {
     shouldUpdate = true;
   }
 
-  if (e.target.classList.contains("cart-item-checkbox")) {
-    const productId = e.target.dataset.productId;
-    const isSelected = e.target.checked;
-
-    // localStorage 업데이트
-    updateCartItemSelection(productId, isSelected);
-
-    shouldUpdate = true;
-  }
-
-  if (e.target.id === "cart-modal-select-all-checkbox") {
-    const isSelected = e.target.checked;
-
-    // localStorage 업데이트
-    toggleSelectAll(isSelected);
-
-    shouldUpdate = true;
-  }
-
   if (e.target.closest(".product-image") || e.target.closest(".product-info")) {
     const productId = e.target.closest(".product-card").dataset.productId;
     router.navigate(`/product/${productId}`);
@@ -410,6 +459,10 @@ const handleClick = async (e) => {
 };
 
 const handleScroll = async (e) => {
+  // 메인페이지에서만 무한 스크롤 처리
+  const currentPath = window.location.pathname;
+  if (currentPath !== "/") return;
+
   const mainState = getMainState();
 
   // 이미 스크롤 처리 중이거나 다음 페이지가 없으면 리턴
@@ -436,7 +489,7 @@ export const initEventListeners = () => {
   document.removeEventListener("change", handleChange);
   document.removeEventListener("keydown", handleKeydown);
   document.removeEventListener("click", handleClick);
-  window.removeEventListener("scroll", handleScroll);
+  document.removeEventListener("scroll", handleScroll);
 
   // 새 이벤트 리스너 등록 (popstate는 router에서 처리)
   document.addEventListener("change", handleChange);

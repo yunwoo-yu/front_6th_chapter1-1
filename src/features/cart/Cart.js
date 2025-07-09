@@ -114,20 +114,7 @@ export const Cart = () => {
                   </label>
                 </div>
                 <!-- 아이템 목록 -->
-                <div class="flex-1 overflow-y-auto">
-                  ${cartItems
-                    .map((product) =>
-                      CartItem({
-                        productId: product.productId,
-                        title: product.title,
-                        quantity: product.quantity,
-                        image: product.image,
-                        lprice: product.lprice,
-                        isSelected: product.isSelected,
-                      }),
-                    )
-                    .join("")}
-                </div>
+                <div class="flex-1 overflow-y-auto">${cartItems.map(CartItem).join("")}</div>
                 <!-- 하단 액션 -->
                 <div class="sticky bottom-0 bg-white border-t border-gray-200 p-4">
                   <!-- 선택된 아이템 정보 -->

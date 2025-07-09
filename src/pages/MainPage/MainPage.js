@@ -2,8 +2,8 @@ import { getCategories, getProducts } from "../../api/productApi";
 import { Footer } from "../../components/layout/Footer";
 import { Header } from "../../components/layout/Header";
 import { Toast } from "../../components/layout/Toast";
-import { update } from "../../core/renderer";
-import { Cart } from "../../features/cart/Cart";
+import { updateCurrent } from "../../core/renderer";
+import { Cart, cartState } from "../../features/cart/Cart";
 import { createState, getSearchParams } from "../../utils/store";
 
 import { CategorySection } from "./components/CategorySection";
@@ -66,6 +66,8 @@ MainPage.onMount = async () => {
   const sortFromUrl = searchParams.get("sort") || "price_asc";
   const searchFromUrl = searchParams.get("search") || "";
 
+  cartState.isOpen = false;
+
   // mainState 완전 초기화
   setMainState({
     products: [],
@@ -84,7 +86,8 @@ MainPage.onMount = async () => {
   });
 
   // 초기 렌더링
-  update(MainPage);
+
+  updateCurrent();
 
   const [productsData, categoriesData] = await Promise.all([
     getProducts(Object.fromEntries(searchParams)),
@@ -105,7 +108,7 @@ MainPage.onMount = async () => {
   }));
 
   // 최종 렌더링
-  update(MainPage);
+  updateCurrent();
 };
 
 MainPage.onUnmount = () => {};
