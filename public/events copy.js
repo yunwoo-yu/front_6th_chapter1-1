@@ -1,9 +1,9 @@
-import { getProducts } from "../api/productApi";
-import { updateCurrent } from "../core/renderer";
+import { getProducts } from "../src/api/productApi";
+import { updateCurrent } from "../src/core/renderer";
 
-import { cartState } from "../features/cart/Cart";
-import { router } from "../core/router";
-import { getMainState, setMainState } from "../pages/MainPage/MainPage";
+import { cartState } from "../src/features/cart/Cart";
+import { router } from "../src/core/router";
+import { getMainState, setMainState } from "../src/pages/MainPage/MainPage";
 import {
   addToCart,
   clearCart,
@@ -13,11 +13,11 @@ import {
   toggleSelectAll,
   updateCartItemSelection,
   updateCartQuantity,
-} from "./carts";
-import { getSearchParams, setSearchParams } from "./store";
+} from "../src/utils/carts";
+import { getSearchParams, setSearchParams } from "../src/utils/store";
 
 import { getDetailState, setDetailState } from "../pages/ProductDetailPage/ProductDetailPage";
-import { setToastState } from "../components/layout/Toast";
+import { setToastState } from "../src/components/layout/Toast";
 
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
@@ -339,6 +339,7 @@ const handleClick = async (e) => {
 
   if (e.target.classList.contains("add-to-cart-btn")) {
     const productId = e.target.dataset.productId;
+
     const mainState = getMainState();
     const product = mainState.products.find((product) => product.productId === productId);
 

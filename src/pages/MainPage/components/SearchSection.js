@@ -1,7 +1,7 @@
-import { getMainState } from "../MainPage";
+import { mainStore } from "../../../stores/mainStore";
 
 export const SearchSection = () => {
-  const mainState = getMainState();
+  const mainState = mainStore.getState();
 
   return /* HTML */ `
     <!-- 검색창 -->

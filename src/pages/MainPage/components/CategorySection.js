@@ -1,9 +1,9 @@
 import { CategoryLoader } from "../../../features/category/CategoryLoader";
 import { CategoryItem } from "../../../features/category/CateogryItem";
-import { getMainState } from "../MainPage";
+import { mainStore } from "../../../stores/mainStore";
 
 export const CategorySection = () => {
-  const mainState = getMainState();
+  const mainState = mainStore.getState();
 
   return /* HTML */ `
     <div class="flex items-center gap-2">

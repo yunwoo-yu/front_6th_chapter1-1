@@ -1,120 +1,146 @@
-import { MainPage } from "../pages/MainPage/MainPage";
-import { ProductDetailPage } from "../pages/ProductDetailPage/ProductDetailPage";
-import { setRouteParams } from "../utils/store";
-import { update } from "./renderer";
+import { createObservable } from "./observer.js";
 
-export const createRouter = (routes) => {
-  let currentRoute = null;
-
-  const findRoute = (path) => {
-    // 쿼리 파라미터 제거하고 pathname만으로 라우트 찾기
-    const pathname = path.split("?")[0];
-
-    return routes.find((route) => {
-      // 정확히 일치하는 라우트 먼저 확인
-      if (route.path === pathname) {
-        return true;
-      }
-
-      // 동적 라우트 확인 (예: /product/:id)
-      const routeParts = route.path.split("/");
-      const pathParts = pathname.split("/");
-
-      if (routeParts.length !== pathParts.length) {
-        return false;
-      }
-
-      return routeParts.every((part, index) => {
-        return part.startsWith(":") || part === pathParts[index];
-      });
-    });
-  };
-
-  // 라우트 파라미터 추출
-  const getRouteParams = (routePath, currentPath) => {
-    const routeParts = routePath.split("/");
-    const pathParts = currentPath.split("?")[0].split("/");
-    const params = {};
-
-    routeParts.forEach((part, index) => {
-      if (part.startsWith(":")) {
-        const paramName = part.slice(1); // ':' 제거
-        params[paramName] = pathParts[index];
-      }
-    });
-
-    return params;
-  };
-
-  // 현재 경로 가져오기
-  const getCurrentPath = () => {
-    return window.location.pathname + window.location.search;
-  };
-
-  // 페이지 이동
-  const navigate = (path, options = {}) => {
-    let fullPath = path;
-
-    // 쿼리 파라미터만 전달된 경우 (예: "?limit=20&page=1")
-    if (path.startsWith("?")) {
-      fullPath = window.location.pathname + path;
-    }
-
-    const route = findRoute(fullPath);
-
-    if (route) {
-      // URL 변경 - replace 옵션에 따라 pushState vs replaceState 선택
-      if (options.replace) {
-        window.history.replaceState({}, "", fullPath);
-      } else {
-        window.history.pushState({}, "", fullPath);
-      }
-      currentRoute = route;
-
-      // 라우트 파라미터 store 업데이트
-      const params = getRouteParams(route.path, fullPath);
-      setRouteParams(params);
-
-      // 컴포넌트 렌더링
-      update(route.component);
-    } else {
-      console.error("Route not found:", fullPath);
-    }
-  };
-
-  // 초기화
-  const init = (onPopState) => {
-    // popstate 이벤트 리스너 등록
-    window.addEventListener("popstate", () => {
-      if (onPopState) {
-        onPopState();
-      } else {
-        // 기본 라우터 동작 testcode popState 이벤트 고려
-        const fullPath = getCurrentPath();
-        navigate(fullPath);
-      }
-    });
-  };
+/**
+ * 경로 패턴을 정규식으로 변환하는 함수
+ * @param {string} pattern - 라우트 패턴 (예: '/product/:id')
+ * @returns {Object} 정규식과 파라미터 키 배열
+ */
+const createRoutePattern = (pattern) => {
+  const paramNames = [];
+  const regexPattern = pattern.replace(/:([^/]+)/g, (match, paramName) => {
+    paramNames.push(paramName);
+    return "([^/]+)";
+  });
 
   return {
-    init,
-    navigate,
-    findRoute,
-    getCurrentPath,
-    getRouteParams,
-    currentRoute,
+    regex: new RegExp(`^${regexPattern}$`),
+    paramNames,
   };
 };
 
-const routesConfig = [
-  {
-    path: "/",
-    component: MainPage,
-  },
-  {
-    path: "/product/:id",
-    component: ProductDetailPage,
-  },
-];
+/**
+ * 경로에서 파라미터를 추출하는 함수
+ * @param {string} pathname - 현재 경로 (쿼리스트링 제외)
+ * @param {Object} route - 라우트 정보
+ * @returns {Object|null} 파라미터 객체 또는 null
+ */
+const extractParams = (pathname, route) => {
+  const match = pathname.match(route.pattern.regex);
+  if (!match) return null;
 
-export const router = createRouter(routesConfig);
+  const params = {};
+  route.pattern.paramNames.forEach((paramName, index) => {
+    params[paramName] = match[index + 1];
+  });
+
+  return params;
+};
+
+/**
+ * 매칭되는 라우트 찾기
+ * @param {string} fullPath - 전체 경로 (쿼리스트링 포함)
+ * @returns {Object|null} 매칭 결과
+ */
+const findMatchingRoute = (fullPath, routes) => {
+  // 🔥 핵심: 쿼리스트링 분리
+  const url = new URL(fullPath, "http://localhost");
+  const pathname = url.pathname; // 쿼리스트링 제외한 경로만
+
+  // pathname으로 라우트 매칭
+  for (const route of routes) {
+    const params = extractParams(pathname, route);
+    if (params !== null) {
+      return { route, params };
+    }
+  }
+
+  return null;
+};
+
+/**
+ * SPA 라우터 생성 함수 (다이나믹 라우트 + 쿼리스트링 지원)
+ * @returns {Object} register, navigate, getCurrentRoute, subscribe, init 메서드를 가진 객체
+ */
+export const createRouter = () => {
+  const routes = [];
+  const observable = createObservable();
+
+  const register = (pattern, component) => {
+    const routePattern = createRoutePattern(pattern);
+    routes.push({
+      pattern: routePattern,
+      originalPattern: pattern,
+      component,
+    });
+  };
+
+  /**
+   * 경로 이동
+   * @param {string} path - 이동할 경로
+   */
+  const navigate = (path) => {
+    const matchResult = findMatchingRoute(path, routes);
+
+    if (matchResult) {
+      history.pushState(null, null, path);
+      observable.notify({
+        path,
+        component: matchResult.route.component,
+        params: matchResult.params,
+      });
+    } else {
+      console.warn(`라우트를 찾을 수 없습니다: ${path}`);
+    }
+  };
+
+  const getCurrentRoute = () => {
+    const fullPath = window.location.pathname + window.location.search;
+    const matchResult = findMatchingRoute(fullPath, routes);
+
+    if (matchResult) {
+      return {
+        path: fullPath,
+        component: matchResult.route.component,
+        params: matchResult.params,
+      };
+    }
+
+    // 기본 라우트 찾기
+    const defaultRoute = routes.find((route) => route.originalPattern === "/");
+    return {
+      path: "/",
+      component: defaultRoute?.component,
+      params: {},
+    };
+  };
+
+  const subscribe = (listener) => {
+    return observable.subscribe(listener);
+  };
+
+  const handlePopState = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const { path, component, params } = getCurrentRoute();
+
+    console.log("popstate 이벤트 감지:", searchParams.toString());
+    observable.notify({ path, component, params });
+  };
+
+  // 브라우저 뒤로가기/앞으로가기 처리
+  const init = () => {
+    // 🔥 테스트에서 dispatchEvent로 트리거되는 popstate 이벤트 처리
+    window.addEventListener("popstate", handlePopState);
+
+    // 초기 라우트도 처리
+    const { path, component, params } = getCurrentRoute();
+    observable.notify({ path, component, params });
+  };
+
+  return { register, navigate, getCurrentRoute, subscribe, init };
+};
+
+export const router = createRouter();
+
+export const navigate = (to) => {
+  router.navigate(to);
+};

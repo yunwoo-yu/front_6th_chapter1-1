@@ -1,34 +1,22 @@
-import { getCategories, getProducts } from "../../api/productApi";
 import { Footer } from "../../components/layout/Footer";
 import { Header } from "../../components/layout/Header";
 import { Toast } from "../../components/layout/Toast";
-import { updateCurrent } from "../../core/renderer";
-import { Cart, cartState } from "../../features/cart/Cart";
-import { createState, getSearchParams } from "../../utils/store";
-
+import { navigate } from "../../core/router";
+import { Cart } from "../../features/cart/Cart";
+import { mainActions, mainStore } from "../../stores/mainStore";
+import { addToCart } from "../../utils/carts";
 import { CategorySection } from "./components/CategorySection";
 import { FilterSection } from "./components/FilterSection";
 import { ProductSection } from "./components/ProductSection";
 import { SearchSection } from "./components/SearchSection";
 
-const MAIN = "MAIN";
-
-export const [getMainState, setMainState] = createState(MAIN, {
-  products: [],
-  isLoading: true,
-  isInfiniteLoading: false,
-  total: 0,
-  page: 1,
-  hasNext: null,
-  categories: {},
-  limit: getSearchParams().get("limit") || "20",
-  sort: getSearchParams().get("sort") || "price_asc",
-  search: getSearchParams().get("search") || "",
-  category1: getSearchParams().get("category1") || "",
-  category2: getSearchParams().get("category2") || "",
-});
-
 export const MainPage = () => {
+  const mainState = mainStore.getState();
+
+  if (mainState.products.length === 0) {
+    mainActions.getProducts();
+  }
+
   return /* HTML */ `
     <div class="min-h-screen bg-gray-50">
       ${Header()}
@@ -54,59 +42,170 @@ export const MainPage = () => {
   `;
 };
 
-// 컴포넌트 라이프사이클 메서드들
-MainPage.onMount = async () => {
-  const searchParams = getSearchParams();
+export const setupMainPageEvent = () => {
+  const root = document.querySelector("#root");
+  let isScrolling = false;
 
-  // URL에서 폼 값들 가져오기
-  const category1FromUrl = searchParams.get("category1") || "";
-  const category2FromUrl = searchParams.get("category2") || "";
-  const limitFromUrl = searchParams.get("limit") || "20";
-  const sortFromUrl = searchParams.get("sort") || "price_asc";
-  const searchFromUrl = searchParams.get("search") || "";
+  if (!root) return;
 
-  cartState.isOpen = false;
+  root.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      if (e.target.id === "search-input" && e.key === "Enter") {
+        const value = e.target.value;
+        const searchParams = new URLSearchParams(window.location.search);
 
-  // mainState 완전 초기화
-  setMainState({
-    products: [],
-    isLoading: true,
-    isInfiniteLoading: false,
-    total: 0,
-    page: 1,
-    hasNext: null,
-    categories: {},
-    category1: category1FromUrl,
-    category2: category2FromUrl,
-    limit: limitFromUrl,
-    sort: sortFromUrl,
-    search: searchFromUrl,
+        searchParams.set("search", value);
+        searchParams.set("page", "1");
+
+        navigate(`?${searchParams.toString()}`);
+
+        await mainActions.getProducts();
+      }
+    }
   });
 
-  // 초기 렌더링
+  root.addEventListener("change", async (e) => {
+    if (e.target.id === "limit-select") {
+      const value = e.target.value;
+      const searchParams = new URLSearchParams(window.location.search);
 
-  updateCurrent();
+      console.log("change", value);
 
-  const [productsData, categoriesData] = await Promise.all([
-    getProducts(Object.fromEntries(searchParams)),
-    getCategories(),
-  ]);
+      searchParams.set("limit", value);
+      searchParams.set("page", "1");
 
-  // API 응답 데이터로 store 업데이트
-  setMainState((prevState) => ({
-    ...prevState,
-    products: productsData.products,
-    total: productsData.pagination.total,
-    categories: categoriesData,
-    isLoading: false,
-    hasNext: productsData.pagination.hasNext,
-    page: productsData.pagination.page,
-    category1: productsData.filters.category1,
-    category2: productsData.filters.category2,
-  }));
+      navigate(`?${searchParams.toString()}`);
 
-  // 최종 렌더링
-  updateCurrent();
+      await mainActions.getProducts();
+    }
+
+    if (e.target.id === "sort-select") {
+      const value = e.target.value;
+      const searchParams = new URLSearchParams(window.location.search);
+
+      searchParams.set("sort", value);
+      searchParams.set("page", "1");
+      navigate(`?${searchParams.toString()}`);
+
+      await mainActions.getProducts();
+    }
+  });
+
+  root.addEventListener("click", async (e) => {
+    const mainState = mainStore.getState();
+
+    if (e.target.classList.contains("add-to-cart-btn")) {
+      const productId = e.target.dataset.productId;
+      const product = mainState.products.find((product) => product.productId === productId);
+
+      if (product) {
+        addToCart(product);
+        mainStore.setState({ ...mainState, toastType: "success" });
+      }
+    }
+
+    if (e.target.closest("#toast-close-btn")) {
+      mainStore.setState({ ...mainState, toastType: null });
+    }
+
+    if (e.target.classList.contains("category1-filter-btn")) {
+      const value = e.target.dataset.category1;
+      const searchParams = new URLSearchParams(window.location.search);
+
+      searchParams.set("category1", value);
+      searchParams.set("page", "1");
+      navigate(`?${searchParams.toString()}`);
+
+      await mainActions.getProducts();
+    } else if (e.target.classList.contains("category2-filter-btn")) {
+      const value = e.target.dataset.category2;
+      const searchParams = new URLSearchParams(window.location.search);
+
+      searchParams.set("category2", value);
+      searchParams.set("page", "1");
+      navigate(`?${searchParams.toString()}`);
+
+      await mainActions.getProducts();
+    }
+
+    if (e.target.dataset.breadcrumb) {
+      const value = e.target.dataset.breadcrumb;
+      const searchParams = new URLSearchParams(window.location.search);
+
+      if (value === "reset") {
+        searchParams.delete("category1");
+        searchParams.delete("category2");
+        navigate(`?${searchParams.toString()}`);
+
+        await mainActions.getProducts();
+      } else if (value === "category1") {
+        searchParams.delete("category2");
+        navigate(`?${searchParams.toString()}`);
+
+        await mainActions.getProducts();
+      }
+    }
+
+    if (e.target.closest("#cart-icon-btn")) {
+      mainStore.setState({ ...mainState, isCartOpen: true });
+    }
+
+    if (e.target.closest("#cart-modal-close-btn")) {
+      mainStore.setState({ ...mainState, isCartOpen: false });
+    }
+  });
+
+  window.addEventListener("scroll", async (e) => {
+    // 이미 로딩 중이거나 더 이상 데이터가 없으면 return
+    if (isScrolling) return;
+
+    const mainState = mainStore.getState();
+
+    // 더 이상 가져올 데이터가 없으면 return
+    if (!mainState.hasNext) return;
+
+    const scrollingElement = e.target.scrollingElement || document.documentElement;
+    const { scrollTop, scrollHeight, clientHeight } = scrollingElement;
+
+    if (!scrollingElement) return;
+
+    // 스크롤이 하단에 가까워졌을 때 (100px 여유)
+    if (scrollHeight - scrollTop <= clientHeight + 100) {
+      console.log("무한스크롤 트리거 - 다음 페이지 로드");
+
+      // 스크롤 중복 방지
+      isScrolling = true;
+
+      // 로딩 상태 설정
+      mainStore.setState({
+        ...mainState,
+        isInfiniteLoading: true,
+      });
+
+      try {
+        // 다음 페이지 번호 계산
+        const searchParams = new URLSearchParams(window.location.search);
+        const currentPage = parseInt(searchParams.get("page") || "1");
+        const nextPage = currentPage + 1;
+
+        console.log(`현재 페이지: ${currentPage}, 다음 페이지: ${nextPage}`);
+
+        // URL 업데이트
+        searchParams.set("page", nextPage.toString());
+        navigate(`?${searchParams.toString()}`);
+
+        // 다음 페이지 데이터 로드
+        await mainActions.getNextProducts();
+      } catch (error) {
+        console.error("무한스크롤 에러:", error);
+      } finally {
+        // 로딩 상태 해제
+        isScrolling = false;
+        mainStore.setState({
+          ...mainStore.getState(),
+          isInfiniteLoading: false,
+        });
+      }
+    }
+  });
 };
-
-MainPage.onUnmount = () => {};

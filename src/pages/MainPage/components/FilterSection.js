@@ -1,7 +1,7 @@
-import { getMainState } from "../MainPage";
+import { mainStore } from "../../../stores/mainStore";
 
 export const FilterSection = () => {
-  const mainState = getMainState();
+  const mainState = mainStore.getState();
 
   return /* HTML */ `
     <!-- 페이지당 상품 수 -->

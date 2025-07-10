@@ -1,7 +1,7 @@
-import { getMainState } from "../../pages/MainPage/MainPage";
+import { mainStore } from "../../stores/mainStore";
 
 export const CategoryItem = ({ category, depth }) => {
-  const mainState = getMainState();
+  const mainState = mainStore.getState();
 
   return /* HTML */ `
     ${depth === 1
@@ -27,3 +27,4 @@ export const CategoryItem = ({ category, depth }) => {
         `}
   `;
 };
+1;

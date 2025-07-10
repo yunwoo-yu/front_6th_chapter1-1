@@ -1,21 +1,7 @@
-// import { updateCurrent } from "../../core/renderer";
-import { createState } from "../../utils/store";
-
-const TOAST = "TOAST";
-
-export const [getToastState, setToastState] = createState(TOAST, {
-  toastType: null,
-});
+import { mainStore } from "../../stores/mainStore";
 
 export const Toast = () => {
-  const toastState = getToastState();
-
-  // if (toastState.toastType) {
-  //   setTimeout(() => {
-  //     setToastState({ toastType: null });
-  //     updateCurrent();
-  //   }, 2000);
-  // }
+  const toastState = mainStore.getState();
 
   return /* HTML */ `
     ${toastState.toastType === "success"

@@ -101,7 +101,7 @@ describe("3. 페이지당 상품 수 선택", () => {
 
     const limitSelect = document.querySelector("#limit-select");
     await userEvent.selectOptions(limitSelect, "10");
-
+    console.log("selectOptions", limitSelect.value);
     await waitFor(() =>
       expect(
         screen.queryByRole("heading", {

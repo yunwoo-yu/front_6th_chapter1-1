@@ -1,37 +1,43 @@
-let root = null;
-let currentComponent = null;
+/**
+ * 렌더링 시스템 생성 함수
+ * @param {string} containerId - 렌더링할 컨테이너 ID
+ * @returns {Object} render, createElement 메서드를 가진 객체
+ */
+export const createRenderer = (containerId) => {
+  const container = document.getElementById(containerId);
 
-export const initRootRenderer = (id = "root") => {
-  root = document.getElementById(id);
+  const render = (component, props = {}) => {
+    if (!container) return;
 
-  if (!root) {
-    console.log("Root element not found");
-  }
-};
+    if (typeof component === "function") {
+      container.innerHTML = component(props);
+    } else {
+      container.innerHTML = component;
+    }
+  };
 
-export const update = (component, onAfterRender) => {
-  if (!root) {
-    console.error("Root element not found");
-    return;
-  }
+  const createElement = (tag, attrs = {}, children = []) => {
+    const element = document.createElement(tag);
 
-  // 현재 컴포넌트 저장
-  currentComponent = component;
+    Object.keys(attrs).forEach((key) => {
+      if (key.startsWith("on")) {
+        const eventName = key.slice(2).toLowerCase();
+        element.addEventListener(eventName, attrs[key]);
+      } else {
+        element.setAttribute(key, attrs[key]);
+      }
+    });
 
-  const targetComponent = component();
+    children.forEach((child) => {
+      if (typeof child === "string") {
+        element.appendChild(document.createTextNode(child));
+      } else {
+        element.appendChild(child);
+      }
+    });
 
-  root.innerHTML = targetComponent;
-  root.offsetHeight; // DOM 강제 리플로우
+    return element;
+  };
 
-  // 렌더링 완료 후 콜백 실행
-  if (onAfterRender) {
-    onAfterRender();
-  }
-};
-
-// 현재 컴포넌트를 다시 렌더링
-export const updateCurrent = (onAfterRender) => {
-  if (currentComponent) {
-    update(currentComponent, onAfterRender);
-  }
+  return { render, createElement };
 };

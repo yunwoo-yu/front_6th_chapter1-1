@@ -1,12 +1,11 @@
+import { mainStore } from "../../stores/mainStore";
 import { getCartItemCount, getCartItems } from "../../utils/carts";
 import { CartItem } from "./CartItem";
 
-export const cartState = {
-  isOpen: false,
-};
-
 export const Cart = () => {
-  if (!cartState.isOpen) return "";
+  const mainState = mainStore.getState();
+
+  if (!mainState.isCartOpen) return "";
 
   const cartItems = getCartItems();
   const cartItemCount = getCartItemCount();
