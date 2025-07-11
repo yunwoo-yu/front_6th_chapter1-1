@@ -1,5 +1,6 @@
-import { initRootRenderer } from "./core/renderer.js";
+import { initRootRenderer, update } from "./core/renderer.js";
 import { router } from "./core/router.js";
+import { NotFoundPage } from "./pages/NotFoundPage/NotFounPage.js";
 import { initEventListeners } from "./utils/events.js";
 import { setRouteParams, setSearchParams } from "./utils/store.js";
 
@@ -10,15 +11,16 @@ const enableMocking = () =>
     }),
   );
 
-let isMainRunning = false;
+// let isMainRunning = false;
 
 // 라우트 정의
 
 export async function main() {
-  if (isMainRunning) {
-    return;
-  }
-  isMainRunning = true;
+  // if (isMainRunning) {
+  //   return;
+  // }
+
+  // isMainRunning = true;
 
   // 공통 초기화
   initRootRenderer();
@@ -51,9 +53,11 @@ export async function main() {
     if (route.component.onMount) {
       await route.component.onMount();
     }
+  } else {
+    update(NotFoundPage);
   }
 
-  isMainRunning = false;
+  // isMainRunning = false;
 }
 
 // 애플리케이션 시작

@@ -71,6 +71,7 @@ export const createRouter = (routes) => {
       } else {
         window.history.pushState({}, "", `${BASE_PATH}${fullPath}`);
       }
+
       currentRoute = route;
 
       // 라우트 파라미터 store 업데이트
