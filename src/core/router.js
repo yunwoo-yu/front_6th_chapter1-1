@@ -1,4 +1,5 @@
 import { MainPage } from "../pages/MainPage/MainPage";
+import { NotFoundPage } from "../pages/NotFoundPage/NotFoundPage";
 import { ProductDetailPage } from "../pages/ProductDetailPage/ProductDetailPage";
 import { setRouteParams } from "../utils/store";
 import { update } from "./renderer";
@@ -48,16 +49,26 @@ export const createRouter = (routes) => {
 
   // 현재 경로 가져오기
   const getCurrentPath = () => {
-    return window.location.pathname + window.location.search;
+    const fullPath = window.location.pathname + window.location.search;
+    // PROD 환경에서 BASE_PATH 제거
+    if (import.meta.env.PROD && fullPath.startsWith("/front_6th_chapter1-1")) {
+      return fullPath.slice("/front_6th_chapter1-1".length) || "/";
+    }
+    return fullPath;
   };
 
-  // 페이지 이동
-  const navigate = (path, options = {}) => {
+  // 페이지 이동 및 렌더링
+  const navigate = async (path, options = {}) => {
     let fullPath = path;
 
     // 쿼리 파라미터만 전달된 경우 (예: "?limit=20&page=1")
     if (path.startsWith("?")) {
       fullPath = window.location.pathname + path;
+    }
+
+    // PROD 환경에서 BASE_PATH 추가
+    if (import.meta.env.PROD && !fullPath.startsWith("/front_6th_chapter1-1")) {
+      fullPath = "/front_6th_chapter1-1" + fullPath;
     }
 
     const route = findRoute(fullPath);
@@ -77,21 +88,56 @@ export const createRouter = (routes) => {
 
       // 컴포넌트 렌더링
       update(route.component);
+
+      // onMount 호출 (isPopState가 true가 아닐 때만 호출)
+      if (route.component.onMount && !options.isPopState) {
+        await route.component.onMount();
+      }
     } else {
-      console.error("Route not found:", fullPath);
+      // 라우트가 없을 때 NotFoundPage 렌더링
+      if (options.replace) {
+        window.history.replaceState({}, "", fullPath);
+      } else {
+        window.history.pushState({}, "", fullPath);
+      }
+
+      update(NotFoundPage);
+    }
+  };
+
+  // popstate 이벤트 처리
+  const handlePopState = async () => {
+    const fullPath = getCurrentPath();
+    const route = findRoute(fullPath);
+
+    if (route) {
+      // 라우트 파라미터 store 업데이트
+      const params = getRouteParams(route.path, fullPath);
+      setRouteParams(params);
+
+      // 컴포넌트 렌더링
+      update(route.component);
+
+      // onMount 호출 (popstate 이벤트에서도 호출)
+      if (route.component.onMount) {
+        await route.component.onMount();
+      }
+    } else {
+      // 라우트가 없을 때 NotFoundPage 렌더링
+      update(NotFoundPage);
     }
   };
 
   // 초기화
   const init = (onPopState) => {
     // popstate 이벤트 리스너 등록
-    window.addEventListener("popstate", () => {
+    window.addEventListener("popstate", async () => {
       if (onPopState) {
-        onPopState();
+        // onPopState 콜백이 있으면 그것을 사용
+        await onPopState();
       } else {
-        // 기본 라우터 동작 testcode popState 이벤트 고려
-        const fullPath = getCurrentPath();
-        navigate(fullPath);
+        // 기본 popstate 처리
+        await handlePopState();
       }
     });
   };
