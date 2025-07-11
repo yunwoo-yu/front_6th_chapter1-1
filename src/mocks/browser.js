@@ -10,6 +10,9 @@ export const workerOptions = import.meta.env.PROD
   ? {
       serviceWorker: {
         url: `${basePath}/mockServiceWorker.js`,
+        options: {
+          scope: `${basePath}/`,
+        },
       },
       onUnhandledRequest: "bypass",
     }
