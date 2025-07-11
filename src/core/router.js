@@ -3,6 +3,8 @@ import { ProductDetailPage } from "../pages/ProductDetailPage/ProductDetailPage"
 import { setRouteParams } from "../utils/store";
 import { update } from "./renderer";
 
+const BASE_PATH = import.meta.env.PROD ? "/front_6th_chapter1-1" : "";
+
 export const createRouter = (routes) => {
   let currentRoute = null;
 
@@ -65,9 +67,9 @@ export const createRouter = (routes) => {
     if (route) {
       // URL 변경 - replace 옵션에 따라 pushState vs replaceState 선택
       if (options.replace) {
-        window.history.replaceState({}, "", fullPath);
+        window.history.replaceState({}, "", `${BASE_PATH}${fullPath}`);
       } else {
-        window.history.pushState({}, "", fullPath);
+        window.history.pushState({}, "", `${BASE_PATH}${fullPath}`);
       }
       currentRoute = route;
 
