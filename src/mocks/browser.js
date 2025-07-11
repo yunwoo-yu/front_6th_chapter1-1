@@ -2,20 +2,8 @@ import { setupWorker } from "msw/browser";
 import { handlers } from "./handlers";
 
 // MSW 워커 설정
-const basePath = import.meta.env.PROD ? "/front_6th_chapter1-1" : "";
-
 export const worker = setupWorker(...handlers);
 
-export const workerOptions = import.meta.env.PROD
-  ? {
-      serviceWorker: {
-        url: `${basePath}/mockServiceWorker.js`,
-        options: {
-          scope: `${basePath}/`,
-        },
-      },
-      onUnhandledRequest: "bypass",
-    }
-  : {
-      onUnhandledRequest: "bypass",
-    };
+export const workerOptions = {
+  onUnhandledRequest: "bypass",
+};
