@@ -12,15 +12,18 @@ export const createRouter = (routes) => {
     // 쿼리 파라미터 제거하고 pathname만으로 라우트 찾기
     const pathname = path.split("?")[0];
 
+    // 프로덕션 환경에서 BASE_PATH 제거
+    const cleanPath = import.meta.env.PROD ? pathname.replace(BASE_PATH, "") || "/" : pathname;
+
     return routes.find((route) => {
       // 정확히 일치하는 라우트 먼저 확인
-      if (route.path === pathname) {
+      if (route.path === cleanPath) {
         return true;
       }
 
       // 동적 라우트 확인 (예: /product/:id)
       const routeParts = route.path.split("/");
-      const pathParts = pathname.split("/");
+      const pathParts = cleanPath.split("/");
 
       if (routeParts.length !== pathParts.length) {
         return false;
