@@ -3,8 +3,7 @@ import { Footer } from "../../components/layout/Footer";
 import { Header } from "../../components/layout/Header";
 import { Toast } from "../../components/layout/Toast";
 import { updateCurrent } from "../../core/renderer";
-import { Cart } from "../../features/cart/Cart";
-import { setCartState } from "../../main";
+import { Cart, cartState } from "../../features/cart/Cart";
 import { createState, getSearchParams } from "../../utils/store";
 
 import { CategorySection } from "./components/CategorySection";
@@ -66,9 +65,7 @@ MainPage.onMount = async () => {
   const sortFromUrl = searchParams.get("sort") || "price_asc";
   const searchFromUrl = searchParams.get("search") || "";
 
-  setCartState({
-    isOpen: false,
-  });
+  cartState.isOpen = false;
 
   // mainState 완전 초기화
   setMainState({
@@ -112,32 +109,4 @@ MainPage.onMount = async () => {
   updateCurrent();
 };
 
-MainPage.onUnmount = () => {
-  const searchParams = getSearchParams();
-
-  const category1FromUrl = searchParams.get("category1") || "";
-  const category2FromUrl = searchParams.get("category2") || "";
-  const limitFromUrl = searchParams.get("limit") || "20";
-  const sortFromUrl = searchParams.get("sort") || "price_asc";
-  const searchFromUrl = searchParams.get("search") || "";
-
-  setCartState({
-    isOpen: false,
-  });
-
-  // mainState 완전 초기화
-  setMainState({
-    products: [],
-    isLoading: true,
-    isInfiniteLoading: false,
-    total: 0,
-    page: 1,
-    hasNext: null,
-    categories: {},
-    category1: category1FromUrl,
-    category2: category2FromUrl,
-    limit: limitFromUrl,
-    sort: sortFromUrl,
-    search: searchFromUrl,
-  });
-};
+MainPage.onUnmount = () => {};
