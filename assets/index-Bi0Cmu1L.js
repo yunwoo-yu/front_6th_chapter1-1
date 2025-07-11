@@ -4,7 +4,7 @@
       <p>© 2025 항해플러스 프론트엔드 쇼핑몰</p>
     </div>
   </footer>
-`,f=`shopping_cart`,p=()=>{let e=localStorage.getItem(f);return e?JSON.parse(e):[]},m=e=>{let t=JSON.stringify(e);localStorage.setItem(f,t)},h=(e,t)=>{let n=p(),r=n.findIndex(t=>t.productId===e.productId);r===-1?n.push({...e,quantity:t||1,isSelected:!1}):n[r].quantity+=e.quantity||1,m(n)},g=e=>{try{let t=p(),n=t.filter(t=>t.productId!==e);return m(n),n}catch(e){return console.error(`장바구니에서 상품을 제거하는 중 오류가 발생했습니다:`,e),p()}},te=()=>{let e=p(),t=e.filter(e=>!e.isSelected);return m(t),t},_=(e,t)=>{try{let n=p(),r=n.findIndex(t=>t.productId===e);return r===-1?(console.error(`상품을 찾을 수 없습니다:`,e),p()):(t===`decrease`?n[r].quantity>1&&--n[r].quantity:n[r].quantity+=1,m(n),n)}catch(e){return console.error(`장바구니 수량을 변경하는 중 오류가 발생했습니다:`,e),p()}},ne=()=>{try{return localStorage.removeItem(f),[]}catch(e){return console.error(`장바구니를 비우는 중 오류가 발생했습니다:`,e),[]}},v=()=>{let e=p();return e.length},y=(e,t)=>{try{let n=p(),r=n.findIndex(t=>t.productId===e);return r!==-1&&(n[r].isSelected=t),m(n),n}catch(e){return console.error(`장바구니 선택 상태를 업데이트하는 중 오류가 발생했습니다:`,e),p()}},b=e=>{try{let t=p(),n=t.map(t=>({...t,isSelected:e}));return m(n),n}catch(e){return console.error(`장바구니 전체 선택을 업데이트하는 중 오류가 발생했습니다:`,e),p()}},x=({isBackButton:e=!1,title:t=`쇼핑몰`}={})=>{let n=v();return`
+`,f=`shopping_cart`,p=()=>{let e=localStorage.getItem(f);return e?JSON.parse(e):[]},m=e=>{let t=JSON.stringify(e);localStorage.setItem(f,t)},h=(e,t)=>{let n=p(),r=n.findIndex(t=>t.productId===e.productId);r===-1?n.push({...e,quantity:t||1,isSelected:!1}):n[r].quantity+=e.quantity||1,m(n)},g=e=>{try{let t=p(),n=t.filter(t=>t.productId!==e);return m(n),n}catch(e){return console.error(`장바구니에서 상품을 제거하는 중 오류가 발생했습니다:`,e),p()}},te=()=>{let e=p(),t=e.filter(e=>!e.isSelected);return m(t),t},_=(e,t)=>{try{let n=p(),r=n.findIndex(t=>t.productId===e);return r===-1?(console.error(`상품을 찾을 수 없습니다:`,e),p()):(t===`decrease`?n[r].quantity>1&&--n[r].quantity:n[r].quantity+=1,m(n),n)}catch(e){return console.error(`장바구니 수량을 변경하는 중 오류가 발생했습니다:`,e),p()}},ne=()=>{try{return localStorage.removeItem(f),[]}catch(e){return console.error(`장바구니를 비우는 중 오류가 발생했습니다:`,e),[]}},v=()=>{let e=p();return e.length},y=(e,t)=>{try{let n=p(),r=n.findIndex(t=>t.productId===e);return r!==-1&&(n[r].isSelected=t),m(n),n}catch(e){return console.error(`장바구니 선택 상태를 업데이트하는 중 오류가 발생했습니다:`,e),p()}},re=e=>{try{let t=p(),n=t.map(t=>({...t,isSelected:e}));return m(n),n}catch(e){return console.error(`장바구니 전체 선택을 업데이트하는 중 오류가 발생했습니다:`,e),p()}},b=({isBackButton:e=!1,title:t=`쇼핑몰`}={})=>{let n=v();return`
     <header class="bg-white shadow-sm sticky top-0 z-40">
       <div class="max-w-md mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
@@ -37,7 +37,7 @@
         </div>
       </div>
     </header>
-  `},S=new Map,C=(e,t)=>{S.has(e)||S.set(e,t);let n=()=>S.get(e),r=t=>{let n=S.get(e),r=typeof t==`function`?t(n):t;S.set(e,r)};return[n,r]},re=`PARAMS`,ie=`ROUTE_PARAMS`,[w,T]=C(re,new URLSearchParams(window.location.search)),[E,D]=C(ie,{}),ae=`TOAST`,[oe,O]=C(ae,{toastType:null});let k=null;const A=()=>{let e=oe();return e.toastType&&!k&&(k=setTimeout(()=>{O({toastType:null}),c(),k=null},2e3)),`
+  `},x=new Map,S=(e,t)=>{x.has(e)||x.set(e,t);let n=()=>x.get(e),r=t=>{let n=x.get(e),r=typeof t==`function`?t(n):t;x.set(e,r)};return[n,r]},ie=`PARAMS`,ae=`ROUTE_PARAMS`,[C,w]=S(ie,new URLSearchParams(window.location.search)),[T,E]=S(ae,{}),oe=`TOAST`,[se,D]=S(oe,{toastType:null}),O=()=>{let e=se();return`
     ${e.toastType===`success`?`
           <div
             class="bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 max-w-sm fixed bottom-3 -translate-x-1/2 left-1/2"
@@ -90,7 +90,7 @@
             </button>
           </div>
         `:``}
-  `},se=({productId:e,title:t,quantity:n,image:r,lprice:i,isSelected:a})=>`
+  `},ce=({productId:e,title:t,quantity:n,image:r,lprice:i,isSelected:a})=>`
     <div class="p-4 space-y-4">
       <div class="flex items-center py-3 border-b border-gray-100 cart-item" data-product-id="${e}">
         <!-- 선택 체크박스 -->
@@ -165,7 +165,7 @@
         </div>
       </div>
     </div>
-  `,j=()=>{let e=p(),t=v(),n=Oe().isOpen;return n?`
+  `,k={isOpen:!1},A=()=>{if(!k.isOpen)return``;let e=p(),t=v();return`
     <div
       class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-black bg-opacity-50 z-50 cart-modal-overlay"
     >
@@ -214,7 +214,7 @@
                   </label>
                 </div>
                 <!-- 아이템 목록 -->
-                <div class="flex-1 overflow-y-auto">${e.map(se).join(``)}</div>
+                <div class="flex-1 overflow-y-auto">${e.map(ce).join(``)}</div>
                 <!-- 하단 액션 -->
                 <div class="sticky bottom-0 bg-white border-t border-gray-200 p-4">
                   <!-- 선택된 아이템 정보 -->
@@ -316,7 +316,7 @@
             </div>
           </div>`}
     </div>
-  `:``},ce=()=>`<div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>`,le=({category:e,depth:t})=>{let n=P();return`
+  `},le=()=>`<div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>`,ue=({category:e,depth:t})=>{let n=N();return`
     ${t===1?`
           <button
             data-category1="${e}"
@@ -333,7 +333,7 @@
             ${e}
           </button>
         `}
-  `},ue=()=>{let e=P();return`
+  `},de=()=>{let e=N();return`
     <div class="flex items-center gap-2">
       <label class="text-sm text-gray-600">카테고리:</label>
       <button data-breadcrumb="reset" class="text-xs hover:text-blue-800 hover:underline">전체</button>
@@ -353,9 +353,9 @@
           `:``}
     </div>
     <div class="flex flex-wrap gap-2">
-      ${e.isLoading?ce():Object.keys(e.category1.trim()?e.categories[e.category1]:e.categories).map(t=>le({category:t,depth:e.category1?2:1})).join(``)}
+      ${e.isLoading?le():Object.keys(e.category1.trim()?e.categories[e.category1]:e.categories).map(t=>ue({category:t,depth:e.category1?2:1})).join(``)}
     </div>
-  `},de=()=>{let e=P();return`
+  `},fe=()=>{let e=N();return`
     <!-- 페이지당 상품 수 -->
     <div class="flex items-center gap-2">
       <label class="text-sm text-gray-600">개수:</label>
@@ -383,7 +383,7 @@
         <option value="name_desc" ${e.sort===`name_desc`?`selected`:``}>이름 역순</option>
       </select>
     </div>
-  `},fe=({title:e,image:t,lprice:n,productId:r,brand:i})=>`
+  `},pe=({title:e,image:t,lprice:n,productId:r,brand:i})=>`
   <div
     class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden product-card"
     data-product-id="${r}"
@@ -414,7 +414,7 @@
       </button>
     </div>
   </div>
-`,M=()=>`
+`,j=()=>`
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
     <div class="aspect-square bg-gray-200"></div>
     <div class="p-3">
@@ -424,7 +424,7 @@
       <div class="h-8 bg-gray-200 rounded"></div>
     </div>
   </div>
-`,pe=()=>{let e=P();return`
+`,me=()=>{let e=N();return`
     <!-- 상품 개수 정보 -->
     ${e.isLoading?``:`
           <div class="mb-4 text-sm text-gray-600">
@@ -434,8 +434,8 @@
     <!-- 상품 그리드 -->
     <div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">
       <!-- 로딩 스켈레톤 -->
-      ${e.isLoading?Array.from({length:4}).map(M).join(``):e.products.map(e=>fe(e)).join(``)}
-      ${e.isInfiniteLoading?Array.from({length:6}).map(M).join(``):``}
+      ${e.isLoading?Array.from({length:4}).map(j).join(``):e.products.map(e=>pe(e)).join(``)}
+      ${e.isInfiniteLoading?Array.from({length:6}).map(j).join(``):``}
     </div>
 
     ${e.isLoading||e.isInfiniteLoading?`
@@ -453,7 +453,7 @@
             </div>
           </div>
         `:`<div class="text-center py-4 text-sm text-gray-500">모든 상품을 확인했습니다</div>`}
-  `},me=()=>{let e=P();return`
+  `},he=()=>{let e=N();return`
     <!-- 검색창 -->
     <div class="mb-4">
       <div class="relative">
@@ -477,94 +477,36 @@
         </div>
       </div>
     </div>
-  `},N=`MAIN`,[P,F]=C(N,{products:[],isLoading:!0,isInfiniteLoading:!1,total:0,page:1,hasNext:null,categories:{},limit:w().get(`limit`)||`20`,sort:w().get(`sort`)||`price_asc`,search:w().get(`search`)||``,category1:w().get(`category1`)||``,category2:w().get(`category2`)||``}),I=()=>`
+  `},M=`MAIN`,[N,P]=S(M,{products:[],isLoading:!0,isInfiniteLoading:!1,total:0,page:1,hasNext:null,categories:{},limit:C().get(`limit`)||`20`,sort:C().get(`sort`)||`price_asc`,search:C().get(`search`)||``,category1:C().get(`category1`)||``,category2:C().get(`category2`)||``}),F=()=>`
     <div class="min-h-screen bg-gray-50">
-      ${x()}
+      ${b()}
       <main class="max-w-md mx-auto px-4 py-4">
         <!-- 검색 및 필터 -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-          ${me()}
+          ${he()}
           <!-- 필터 옵션 -->
           <div class="space-y-3">
             <!-- 카테고리 필터 -->
-            <div class="space-y-2">${ue()}</div>
+            <div class="space-y-2">${de()}</div>
             <!-- 기존 필터들 -->
-            <div class="flex gap-2 items-center justify-between">${de()}</div>
+            <div class="flex gap-2 items-center justify-between">${fe()}</div>
           </div>
         </div>
         <!-- 상품 목록 -->
         <div class="mb-6">
-          <div>${pe()}</div>
+          <div>${me()}</div>
         </div>
       </main>
-      ${d()} ${A()} ${j()}
+      ${d()} ${O()} ${A()}
     </div>
-  `;I.onMount=async()=>{let e=w(),t=e.get(`category1`)||``,n=e.get(`category2`)||``,r=e.get(`limit`)||`20`,i=e.get(`sort`)||`price_asc`,a=e.get(`search`)||``;$({isOpen:!1}),F({products:[],isLoading:!0,isInfiniteLoading:!1,total:0,page:1,hasNext:null,categories:{},category1:t,category2:n,limit:r,sort:i,search:a}),c();let[o,s]=await Promise.all([l(Object.fromEntries(e)),ee()]);F(e=>({...e,products:o.products,total:o.pagination.total,categories:s,isLoading:!1,hasNext:o.pagination.hasNext,page:o.pagination.page,category1:o.filters.category1,category2:o.filters.category2})),c()},I.onUnmount=()=>{let e=w(),t=e.get(`category1`)||``,n=e.get(`category2`)||``,r=e.get(`limit`)||`20`,i=e.get(`sort`)||`price_asc`,a=e.get(`search`)||``;$({isOpen:!1}),F({products:[],isLoading:!0,isInfiniteLoading:!1,total:0,page:1,hasNext:null,categories:{},category1:t,category2:n,limit:r,sort:i,search:a})};const L=()=>`
-    <main class="max-w-md mx-auto px-4 py-4">
-      <div class="text-center my-4 py-20 shadow-md p-6 bg-white rounded-lg">
-        <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#4285f4;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#1a73e8;stop-opacity:1" />
-            </linearGradient>
-            <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#000000" flood-opacity="0.1" />
-            </filter>
-          </defs>
-
-          <!-- 404 Numbers -->
-          <text
-            x="160"
-            y="85"
-            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-            font-size="48"
-            font-weight="600"
-            fill="url(#blueGradient)"
-            text-anchor="middle"
-          >
-            404
-          </text>
-
-          <!-- Icon decoration -->
-          <circle cx="80" cy="60" r="3" fill="#e8f0fe" opacity="0.8" />
-          <circle cx="240" cy="60" r="3" fill="#e8f0fe" opacity="0.8" />
-          <circle cx="90" cy="45" r="2" fill="#4285f4" opacity="0.5" />
-          <circle cx="230" cy="45" r="2" fill="#4285f4" opacity="0.5" />
-
-          <!-- Message -->
-          <text
-            x="160"
-            y="110"
-            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-            font-size="14"
-            font-weight="400"
-            fill="#5f6368"
-            text-anchor="middle"
-          >
-            페이지를 찾을 수 없습니다
-          </text>
-
-          <!-- Subtle bottom accent -->
-          <rect x="130" y="130" width="60" height="2" rx="1" fill="url(#blueGradient)" opacity="0.3" />
-        </svg>
-
-        <a
-          href="/"
-          data-link
-          class="inline-block px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >홈으로</a
-        >
-      </div>
-    </main>
-  `;L.onMount=()=>{},L.onUnmount=()=>{};const R=()=>`
+  `;F.onMount=async()=>{let e=C(),t=e.get(`category1`)||``,n=e.get(`category2`)||``,r=e.get(`limit`)||`20`,i=e.get(`sort`)||`price_asc`,a=e.get(`search`)||``;k.isOpen=!1,P({products:[],isLoading:!0,isInfiniteLoading:!1,total:0,page:1,hasNext:null,categories:{},category1:t,category2:n,limit:r,sort:i,search:a}),c();let[o,s]=await Promise.all([l(Object.fromEntries(e)),ee()]);P(e=>({...e,products:o.products,total:o.pagination.total,categories:s,isLoading:!1,hasNext:o.pagination.hasNext,page:o.pagination.page,category1:o.filters.category1,category2:o.filters.category2})),c()},F.onUnmount=()=>{};const I=()=>`
     <div class="py-20 bg-gray-50 flex items-center justify-center">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
         <p class="text-gray-600">상품 정보를 불러오는 중...</p>
       </div>
     </div>
-  `,z=()=>{let{product:e}=B();return e?`
+  `,L=()=>{let{product:e}=z();return e?`
     <nav class="mb-4">
       <div class="flex items-center space-x-2 text-sm text-gray-600">
         <a href="/" data-link="" class="hover:text-blue-600 transition-colors">홈</a>
@@ -578,7 +520,7 @@
         <button class="breadcrumb-link" data-category2="${e.category2}">${e.category2}</button>
       </div>
     </nav>
-  `:``},he=()=>{let{product:e,quantity:t}=B();if(!e)return``;let{productId:n,title:r,rating:i,reviewCount:a,lprice:o,stock:s,description:c,image:l}=e;return`
+  `:``},R=()=>{let{product:e,quantity:t}=z();if(!e)return``;let{productId:n,title:r,rating:i,reviewCount:a,lprice:o,stock:s,description:c,image:l}=e;return`
     <!-- 상품 상세 정보 -->
     <div class="bg-white rounded-lg shadow-sm mb-6">
       <!-- 상품 이미지 -->
@@ -676,7 +618,7 @@
         </button>
       </div>
     </div>
-  `},ge=()=>{let{relatedProducts:e,isLoading:t}=B();return t||!e||e.length===0?``:`
+  `},ge=()=>{let{relatedProducts:e,isLoading:t}=z();return t||!e||e.length===0?``:`
     <div class="bg-white rounded-lg shadow-sm">
       <div class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-bold text-gray-900">관련 상품</h2>
@@ -704,12 +646,12 @@
         </div>
       </div>
     </div>
-  `},_e=`DETAIL`,[B,V]=C(_e,{product:null,relatedProducts:[],isLoading:!0,isRelatedLoading:!0,quantity:1}),H=()=>{let{isLoading:e,isRelatedLoading:t}=B();return e?``:`
+  `},_e=`DETAIL`,[z,B]=S(_e,{product:null,relatedProducts:[],isLoading:!0,isRelatedLoading:!0,quantity:1}),V=()=>{let{isLoading:e,isRelatedLoading:t}=z();return e?``:`
     <div class="min-h-screen bg-gray-50">
-      ${x({isBackButton:!0,title:`상품 상세`})}
+      ${b({isBackButton:!0,title:`상품 상세`})}
       <main class="max-w-md mx-auto px-4 py-4">
-        ${z()} ${he()} ${t?R():ge()}
-        ${d()} ${A()} ${j()}
+        ${L()} ${R()} ${t?I():ge()}
+        ${d()} ${O()} ${A()}
       </main>
     </div>
-  `};H.onMount=async()=>{let e=E(),t=e.id,n=await u(t);V(e=>({...e,product:n,isLoading:!1,isRelatedLoading:!0})),c();let r=await l({category2:n.category2});V(e=>({...e,relatedProducts:r.products.filter(e=>e.productId!==t),isRelatedLoading:!1})),c()},H.onUnmount=()=>{V({product:null,relatedProducts:[],isLoading:!0,quantity:1})};const ve=e=>{let t=null,n=t=>{let n=t.split(`?`)[0];return e.find(e=>{if(e.path===n)return!0;let t=e.path.split(`/`),r=n.split(`/`);return t.length===r.length?t.every((e,t)=>e.startsWith(`:`)||e===r[t]):!1})},r=(e,t)=>{let n=e.split(`/`),r=t.split(`?`)[0].split(`/`),i={};return n.forEach((e,t)=>{if(e.startsWith(`:`)){let n=e.slice(1);i[n]=r[t]}}),i},i=()=>{let e=window.location.pathname+window.location.search;return e.startsWith(`/front_6th_chapter1-1`)?e.slice(21)||`/`:e},a=async(e,i={})=>{let a=e;e.startsWith(`?`)&&(a=window.location.pathname+e),a.startsWith(`/front_6th_chapter1-1`)||(a=`/front_6th_chapter1-1`+a);let o=n(a);if(o){i.replace?window.history.replaceState({},``,a):window.history.pushState({},``,a),t=o;let e=r(o.path,a);D(e),s(o.component),o.component.onMount&&!i.isPopState&&await o.component.onMount()}else i.replace?window.history.replaceState({},``,a):window.history.pushState({},``,a),s(L)},o=async()=>{let e=i(),t=n(e);if(t){let n=r(t.path,e);D(n),s(t.component),t.component.onMount&&await t.component.onMount()}else s(L)},c=e=>{window.addEventListener(`popstate`,async()=>{e?await e():await o()})};return{init:c,navigate:a,findRoute:n,getCurrentPath:i,getRouteParams:r,currentRoute:t}},ye=[{path:`/`,component:I},{path:`/product/:id`,component:H}],U=ve(ye),be=async e=>{let t=P(),n=w();F({...t,limit:e,page:1}),n.set(`limit`,e),n.set(`page`,`1`),T(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);F({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,limit:e})},xe=async e=>{let t=P(),n=w();F({...t,sort:e,page:1}),n.set(`sort`,e),n.set(`page`,`1`),T(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);F({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,sort:e})},Se=async e=>{let t=P(),n=w();F({...t,search:e,page:1}),n.set(`search`,e),n.set(`page`,`1`),T(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);F({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,total:i.pagination.total,search:e})},W=async(e,t)=>{let n=P(),r=w();t===1?(F({...n,category1:e,category2:``,page:1}),r.set(`category1`,e),r.delete(`category2`)):t===2?(F({...n,category2:e,page:1}),r.set(`category2`,e)):(F({...n,category1:``,category2:``,page:1}),r.delete(`category1`),r.delete(`category2`)),r.set(`page`,`1`),T(r),U.navigate(`?${r.toString()}`);let i=Object.fromEntries(r),a=await l(i);F({...n,products:a.products,page:a.pagination.page,hasNext:a.pagination.hasNext,total:a.pagination.total,category1:a.filters.category1,category2:a.filters.category2})},Ce=async(e,t,n=`/`)=>{let r=P(),i=w();F({...r,category1:e||``,category2:t||``,page:1}),e?i.set(`category1`,e):i.delete(`category1`),t?i.set(`category2`,t):i.delete(`category2`),i.set(`page`,`1`),T(i),U.navigate(`${n}?${i.toString()}`);let a=Object.fromEntries(i),o=await l(a);F({...r,products:o.products,page:o.pagination.page,hasNext:o.pagination.hasNext,total:o.pagination.total,category1:o.filters.category1,category2:o.filters.category2})},we=async e=>{let t=P(),n=w();e===`reset`?(F({...t,category1:``,category2:``,page:1}),n.delete(`category1`),n.delete(`category2`)):e===`category1`&&(F({...t,category2:``,page:1}),n.delete(`category2`)),n.set(`page`,`1`),T(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);F({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,total:i.pagination.total,category1:i.filters.category1,category2:i.filters.category2})},Te=async()=>{let e=P(),t=w();if(e.isInfiniteLoading||!e.hasNext)return;F({...e,isInfiniteLoading:!0}),c();let n=e.page+1;t.set(`page`,n.toString()),T(t),U.navigate(`?${t.toString()}`,{replace:!0});let r=Object.fromEntries(t),i=await l(r);F({...e,products:[...e.products,...i.products],page:i.pagination.page,hasNext:i.pagination.hasNext,isInfiniteLoading:!1}),c()};let G=!1,K=!1;const q=async e=>{if(e.target.id===`limit-select`){let t=e.target.value;await be(t)}if(e.target.id===`sort-select`){let t=e.target.value;await xe(t)}if(e.target.closest(`#cart-modal-select-all-checkbox`)){let e=p(),t=e.every(e=>e.isSelected),n=!t;b(n)}if(e.target.classList.contains(`cart-item-checkbox`)){let t=e.target.dataset.productId,n=e.target.checked;y(t,n)}c()},J=async e=>{if(e.target.id===`search-input`&&e.key===`Enter`){let t=e.target.value;await Se(t),c()}e.key===`Escape`&&($({isOpen:!1}),c())},Y=async e=>{let t=!1;if(e.target.classList.contains(`add-to-cart-btn`)){let n=e.target.dataset.productId,r=P(),i=r.products.find(e=>e.productId===n);i&&(h(i),O({toastType:`success`}),t=!0)}if(e.target.id===`add-to-cart-btn`){let e=B(),n=e.product;n&&(h(n,e.quantity),V(e=>({...e,quantity:1})),O({toastType:`success`}),t=!0)}if(e.target.closest(`#toast-close-btn`)&&(O({toastType:null}),t=!0),e.target.classList.contains(`category1-filter-btn`)?(await W(e.target.dataset.category1,1),t=!0):e.target.classList.contains(`category2-filter-btn`)&&(await W(e.target.dataset.category2,2),t=!0),e.target.dataset.breadcrumb&&(await we(e.target.dataset.breadcrumb),t=!0),e.target.classList.contains(`breadcrumb-link`)){let n=e.target.dataset.category1,r=e.target.dataset.category2;await Ce(n,r),t=!0}if(e.target.closest(`#cart-icon-btn`)&&($({isOpen:!0}),t=!0),e.target.closest(`#cart-modal-close-btn`)&&($({isOpen:!1}),t=!0),e.target.closest(`#quantity-decrease`)&&(V(e=>({...e,quantity:e.quantity-1})),t=!0),e.target.closest(`#quantity-increase`)&&(V(e=>({...e,quantity:e.quantity+1})),t=!0),e.target.closest(`.quantity-decrease-btn`)){let n=e.target.closest(`.quantity-decrease-btn`).dataset.productId,r=_(n,`decrease`),i=document.querySelector(`[data-product-id="${n}"].quantity-input`);if(i&&r){let e=r.find(e=>e.productId===n);e&&(i.value=e.quantity)}t=!0}if(e.target.closest(`.quantity-increase-btn`)){let n=e.target.closest(`.quantity-increase-btn`).dataset.productId,r=_(n,`increase`),i=document.querySelector(`[data-product-id="${n}"].quantity-input`);if(i&&r){let e=r.find(e=>e.productId===n);e&&(i.value=e.quantity)}t=!0}if(e.target.closest(`.cart-modal-overlay`)&&!e.target.closest(`[data-modal-content]`)&&($({isOpen:!1}),t=!0),e.target.closest(`.cart-item-remove-btn`)){let n=e.target.closest(`.cart-item-remove-btn`).dataset.productId;g(n),t=!0}if(e.target.closest(`#cart-modal-remove-selected-btn`)&&(te(),t=!0),e.target.closest(`#cart-modal-clear-cart-btn`)&&(ne(),t=!0),e.target.closest(`.product-image`)||e.target.closest(`.product-info`)){let n=e.target.closest(`.product-card`).dataset.productId;U.navigate(`/product/${n}`);let r=U.findRoute(U.getCurrentPath());r.component.onMount&&r.component.onMount(),t=!0}if(e.target.closest(`.related-product-card`)){let n=e.target.closest(`.related-product-card`).dataset.productId;U.navigate(`/product/${n}`);let r=U.findRoute(U.getCurrentPath());r.component.onMount&&r.component.onMount(),t=!0}t&&c()},X=async e=>{let t=window.location.pathname;if(t!==`/`)return;let n=P();if(K||!n.hasNext)return;let r=e.target.scrollingElement||document.documentElement;if(!r)return;let{scrollTop:i,scrollHeight:a,clientHeight:o}=r;a-i<=o+100&&(K=!0,await Te(),K=!1)},Z=()=>{G||(document.removeEventListener(`change`,q),document.removeEventListener(`keydown`,J),document.removeEventListener(`click`,Y),document.removeEventListener(`scroll`,X),document.addEventListener(`change`,q),document.addEventListener(`keydown`,J),document.addEventListener(`click`,Y),window.addEventListener(`scroll`,X),G=!0)},Ee=`CART`,De=()=>r(async()=>{let{worker:e}=await import(`./browser-vWTd4VZR.js`);return{worker:e}},[]).then(({worker:e})=>e.start({onUnhandledRequest:`bypass`}));let Q=!1;const[Oe,$]=C(Ee,{isOpen:!1}),ke=async()=>{let e=U.getCurrentPath(),t=U.findRoute(e);if(t){let n=U.getRouteParams(t.path,e);D(n),await U.navigate(e,{replace:!0,isPopState:!0})}else await U.navigate(e,{replace:!0,isPopState:!0})};async function Ae(){if(Q)return;Q=!0,o(),Z(),U.init(ke);let e=new URLSearchParams(window.location.search);T(e),e.has(`page`)&&(e.delete(`page`),T(e),U.navigate(`?${e.toString()}`,{replace:!0}));let t=U.getCurrentPath(),n=U.findRoute(t);if(n){let e=U.getRouteParams(n.path,t);D(e),U.navigate(t,{replace:!0})}else U.navigate(t,{replace:!0});Q=!1}De().then(Ae);
+  `};V.onMount=async()=>{let e=T(),t=e.id,n=await u(t);B(e=>({...e,product:n,isLoading:!1,isRelatedLoading:!0})),c();let r=await l({category2:n.category2});B(e=>({...e,relatedProducts:r.products.filter(e=>e.productId!==t),isRelatedLoading:!1})),c()},V.onUnmount=()=>{B({product:null,relatedProducts:[],isLoading:!0,quantity:1})};const H=`/front_6th_chapter1-1`,ve=e=>{let t=null,n=t=>{let n=t.split(`?`)[0];return e.find(e=>{if(e.path===n)return!0;let t=e.path.split(`/`),r=n.split(`/`);return t.length===r.length?t.every((e,t)=>e.startsWith(`:`)||e===r[t]):!1})},r=(e,t)=>{let n=e.split(`/`),r=t.split(`?`)[0].split(`/`),i={};return n.forEach((e,t)=>{if(e.startsWith(`:`)){let n=e.slice(1);i[n]=r[t]}}),i},i=()=>window.location.pathname+window.location.search,a=(e,i={})=>{let a=e;e.startsWith(`?`)&&(a=window.location.pathname+e);let o=n(a);if(o){i.replace?window.history.replaceState({},``,`${H}${a}`):window.history.pushState({},``,`${H}${a}`),t=o;let e=r(o.path,a);E(e),s(o.component)}else console.error(`Route not found:`,a)},o=e=>{window.addEventListener(`popstate`,()=>{if(e)e();else{let e=i();a(e)}})};return{init:o,navigate:a,findRoute:n,getCurrentPath:i,getRouteParams:r,currentRoute:t}},ye=[{path:`/`,component:F},{path:`/product/:id`,component:V}],U=ve(ye),be=async e=>{let t=N(),n=C();P({...t,limit:e,page:1}),n.set(`limit`,e),n.set(`page`,`1`),w(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);P({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,limit:e})},xe=async e=>{let t=N(),n=C();P({...t,sort:e,page:1}),n.set(`sort`,e),n.set(`page`,`1`),w(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);P({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,sort:e})},Se=async e=>{let t=N(),n=C();P({...t,search:e,page:1}),n.set(`search`,e),n.set(`page`,`1`),w(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);P({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,total:i.pagination.total,search:e})},W=async(e,t)=>{let n=N(),r=C();t===1?(P({...n,category1:e,category2:``,page:1}),r.set(`category1`,e),r.delete(`category2`)):t===2?(P({...n,category2:e,page:1}),r.set(`category2`,e)):(P({...n,category1:``,category2:``,page:1}),r.delete(`category1`),r.delete(`category2`)),r.set(`page`,`1`),w(r),U.navigate(`?${r.toString()}`);let i=Object.fromEntries(r),a=await l(i);P({...n,products:a.products,page:a.pagination.page,hasNext:a.pagination.hasNext,total:a.pagination.total,category1:a.filters.category1,category2:a.filters.category2})},Ce=async(e,t,n=`/`)=>{let r=N(),i=C();P({...r,category1:e||``,category2:t||``,page:1}),e?i.set(`category1`,e):i.delete(`category1`),t?i.set(`category2`,t):i.delete(`category2`),i.set(`page`,`1`),w(i),U.navigate(`${n}?${i.toString()}`);let a=Object.fromEntries(i),o=await l(a);P({...r,products:o.products,page:o.pagination.page,hasNext:o.pagination.hasNext,total:o.pagination.total,category1:o.filters.category1,category2:o.filters.category2})},we=async e=>{let t=N(),n=C();e===`reset`?(P({...t,category1:``,category2:``,page:1}),n.delete(`category1`),n.delete(`category2`)):e===`category1`&&(P({...t,category2:``,page:1}),n.delete(`category2`)),n.set(`page`,`1`),w(n),U.navigate(`?${n.toString()}`);let r=Object.fromEntries(n),i=await l(r);P({...t,products:i.products,page:i.pagination.page,hasNext:i.pagination.hasNext,total:i.pagination.total,category1:i.filters.category1,category2:i.filters.category2})},Te=async()=>{let e=N(),t=C();if(e.isInfiniteLoading||!e.hasNext)return;P({...e,isInfiniteLoading:!0}),c();let n=e.page+1;t.set(`page`,n.toString()),w(t),U.navigate(`?${t.toString()}`,{replace:!0});let r=Object.fromEntries(t),i=await l(r);P({...e,products:[...e.products,...i.products],page:i.pagination.page,hasNext:i.pagination.hasNext,isInfiniteLoading:!1}),c()};let G=!1,K=!1;const q=async e=>{if(e.target.id===`limit-select`){let t=e.target.value;await be(t)}if(e.target.id===`sort-select`){let t=e.target.value;await xe(t)}if(e.target.closest(`#cart-modal-select-all-checkbox`)){let e=p(),t=e.every(e=>e.isSelected),n=!t;re(n)}if(e.target.classList.contains(`cart-item-checkbox`)){let t=e.target.dataset.productId,n=e.target.checked;y(t,n)}c()},J=async e=>{if(e.target.id===`search-input`&&e.key===`Enter`){let t=e.target.value;await Se(t),c()}e.key===`Escape`&&k.isOpen&&(k.isOpen=!1,c())},Y=async e=>{let t=!1;if(e.target.classList.contains(`add-to-cart-btn`)){let n=e.target.dataset.productId,r=N(),i=r.products.find(e=>e.productId===n);i&&(h(i),D({toastType:`success`}),t=!0)}if(e.target.id===`add-to-cart-btn`){let e=z(),n=e.product;n&&(h(n,e.quantity),B(e=>({...e,quantity:1})),D({toastType:`success`}),t=!0)}if(e.target.closest(`#toast-close-btn`)&&(D({toastType:null}),t=!0),e.target.classList.contains(`category1-filter-btn`)?(await W(e.target.dataset.category1,1),t=!0):e.target.classList.contains(`category2-filter-btn`)&&(await W(e.target.dataset.category2,2),t=!0),e.target.dataset.breadcrumb&&(await we(e.target.dataset.breadcrumb),t=!0),e.target.classList.contains(`breadcrumb-link`)){let n=e.target.dataset.category1,r=e.target.dataset.category2;await Ce(n,r),t=!0}if(e.target.closest(`#cart-icon-btn`)&&(k.isOpen=!0,t=!0),e.target.closest(`#cart-modal-close-btn`)&&(k.isOpen=!1,t=!0),e.target.closest(`#quantity-decrease`)&&(B(e=>({...e,quantity:e.quantity-1})),t=!0),e.target.closest(`#quantity-increase`)&&(B(e=>({...e,quantity:e.quantity+1})),t=!0),e.target.closest(`.quantity-decrease-btn`)){let n=e.target.closest(`.quantity-decrease-btn`).dataset.productId,r=_(n,`decrease`),i=document.querySelector(`[data-product-id="${n}"].quantity-input`);if(i&&r){let e=r.find(e=>e.productId===n);e&&(i.value=e.quantity)}t=!0}if(e.target.closest(`.quantity-increase-btn`)){let n=e.target.closest(`.quantity-increase-btn`).dataset.productId,r=_(n,`increase`),i=document.querySelector(`[data-product-id="${n}"].quantity-input`);if(i&&r){let e=r.find(e=>e.productId===n);e&&(i.value=e.quantity)}t=!0}if(e.target.closest(`.cart-modal-overlay`)&&!e.target.closest(`[data-modal-content]`)&&(k.isOpen=!1,t=!0),e.target.closest(`.cart-item-remove-btn`)){let n=e.target.closest(`.cart-item-remove-btn`).dataset.productId;g(n),t=!0}if(e.target.closest(`#cart-modal-remove-selected-btn`)&&(te(),t=!0),e.target.closest(`#cart-modal-clear-cart-btn`)&&(ne(),t=!0),e.target.closest(`.product-image`)||e.target.closest(`.product-info`)){let n=e.target.closest(`.product-card`).dataset.productId;U.navigate(`/product/${n}`);let r=U.findRoute(U.getCurrentPath());r.component.onMount&&r.component.onMount(),t=!0}if(e.target.closest(`.related-product-card`)){let n=e.target.closest(`.related-product-card`).dataset.productId;U.navigate(`/product/${n}`);let r=U.findRoute(U.getCurrentPath());r.component.onMount&&r.component.onMount(),t=!0}t&&c()},X=async e=>{let t=window.location.pathname;if(t!==`/`)return;let n=N();if(K||!n.hasNext)return;let r=e.target.scrollingElement||document.documentElement;if(!r)return;let{scrollTop:i,scrollHeight:a,clientHeight:o}=r;a-i<=o+100&&(K=!0,await Te(),K=!1)},Z=()=>{G||(document.removeEventListener(`change`,q),document.removeEventListener(`keydown`,J),document.removeEventListener(`click`,Y),document.removeEventListener(`scroll`,X),document.addEventListener(`change`,q),document.addEventListener(`keydown`,J),document.addEventListener(`click`,Y),window.addEventListener(`scroll`,X),G=!0)},Ee=()=>r(async()=>{let{worker:e}=await import(`./browser-vWTd4VZR.js`);return{worker:e}},[]).then(({worker:e})=>e.start({onUnhandledRequest:`bypass`}));let Q=!1;async function $(){if(Q)return;Q=!0,o(),Z(),U.init($);let e=new URLSearchParams(window.location.search);w(e),e.has(`page`)&&(e.delete(`page`),w(e),U.navigate(`?${e.toString()}`,{replace:!0}));let t=U.getCurrentPath(),n=U.findRoute(t);if(n){let e=U.getRouteParams(n.path,t);E(e),U.navigate(t,{replace:!0}),n.component.onMount&&await n.component.onMount()}Q=!1}Ee().then($);
