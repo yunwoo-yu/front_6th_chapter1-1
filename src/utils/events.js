@@ -1,7 +1,6 @@
 import { getProducts } from "../api/productApi";
 import { updateCurrent } from "../core/renderer";
 
-import { cartState } from "../features/cart/Cart";
 import { router } from "../core/router";
 import { getMainState, setMainState } from "../pages/MainPage/MainPage";
 import {
@@ -16,8 +15,9 @@ import {
 } from "./carts";
 import { getSearchParams, setSearchParams } from "./store";
 
-import { getDetailState, setDetailState } from "../pages/ProductDetailPage/ProductDetailPage";
 import { setToastState } from "../components/layout/Toast";
+import { setCartState } from "../main";
+import { getDetailState, setDetailState } from "../pages/ProductDetailPage/ProductDetailPage";
 
 // 표시 개수 변경 이벤트 핸들러
 const handleLimitChange = async (value) => {
@@ -327,10 +327,10 @@ const handleKeydown = async (e) => {
   }
 
   if (e.key === "Escape") {
-    if (cartState.isOpen) {
-      cartState.isOpen = false;
-      updateCurrent();
-    }
+    setCartState({
+      isOpen: false,
+    });
+    updateCurrent();
   }
 };
 
@@ -399,12 +399,16 @@ const handleClick = async (e) => {
   }
 
   if (e.target.closest("#cart-icon-btn")) {
-    cartState.isOpen = true;
+    setCartState({
+      isOpen: true,
+    });
     shouldUpdate = true;
   }
 
   if (e.target.closest("#cart-modal-close-btn")) {
-    cartState.isOpen = false;
+    setCartState({
+      isOpen: false,
+    });
     shouldUpdate = true;
   }
 
@@ -450,7 +454,9 @@ const handleClick = async (e) => {
   }
 
   if (e.target.closest(".cart-modal-overlay") && !e.target.closest("[data-modal-content]")) {
-    cartState.isOpen = false;
+    setCartState({
+      isOpen: false,
+    });
     shouldUpdate = true;
   }
 

@@ -1,7 +1,9 @@
 import { initRootRenderer } from "./core/renderer.js";
 import { router } from "./core/router.js";
 import { initEventListeners } from "./utils/events.js";
-import { setRouteParams, setSearchParams } from "./utils/store.js";
+import { createState, setRouteParams, setSearchParams } from "./utils/store.js";
+
+const CART = "CART";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -12,7 +14,9 @@ const enableMocking = () =>
 
 let isMainRunning = false;
 
-// 라우트 정의
+export const [getCartState, setCartState] = createState(CART, {
+  isOpen: false,
+});
 
 export async function main() {
   if (isMainRunning) {

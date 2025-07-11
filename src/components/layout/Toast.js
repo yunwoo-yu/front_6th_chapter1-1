@@ -1,4 +1,4 @@
-// import { updateCurrent } from "../../core/renderer";
+import { updateCurrent } from "../../core/renderer";
 import { createState } from "../../utils/store";
 
 const TOAST = "TOAST";
@@ -7,15 +7,19 @@ export const [getToastState, setToastState] = createState(TOAST, {
   toastType: null,
 });
 
+let toastTimer = null;
+
 export const Toast = () => {
   const toastState = getToastState();
 
-  // if (toastState.toastType) {
-  //   setTimeout(() => {
-  //     setToastState({ toastType: null });
-  //     updateCurrent();
-  //   }, 2000);
-  // }
+  // Toast가 표시되면 2초 후 자동으로 사라지게 설정
+  if (toastState.toastType && !toastTimer) {
+    toastTimer = setTimeout(() => {
+      setToastState({ toastType: null });
+      updateCurrent();
+      toastTimer = null;
+    }, 2000);
+  }
 
   return /* HTML */ `
     ${toastState.toastType === "success"
