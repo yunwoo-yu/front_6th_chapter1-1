@@ -6,7 +6,11 @@ import { createState, setRouteParams, setSearchParams } from "./utils/store.js";
 const CART = "CART";
 
 const enableMocking = () =>
-  import("./mocks/browser.js").then(({ worker, workerOptions }) => worker.start(workerOptions));
+  import("./mocks/browser.js").then(({ worker }) =>
+    worker.start({
+      onUnhandledRequest: "bypass",
+    }),
+  );
 
 let isMainRunning = false;
 
@@ -50,7 +54,7 @@ export async function main() {
   if (searchParams.has("page")) {
     searchParams.delete("page");
     setSearchParams(searchParams);
-    await router.navigate(`?${searchParams.toString()}`, { replace: true });
+    router.navigate(`?${searchParams.toString()}`, { replace: true });
   }
 
   const currentPath = router.getCurrentPath();
@@ -59,13 +63,14 @@ export async function main() {
   if (route) {
     // 라우트 파라미터를 store에 저장
     const params = router.getRouteParams(route.path, currentPath);
+
     setRouteParams(params);
 
     // 컴포넌트 렌더링 및 onMount 호출
-    await router.navigate(currentPath, { replace: true });
+    router.navigate(currentPath, { replace: true });
   } else {
     // 라우트가 없을 때 NotFoundPage 렌더링
-    await router.navigate(currentPath, { replace: true });
+    router.navigate(currentPath, { replace: true });
   }
 
   isMainRunning = false;
