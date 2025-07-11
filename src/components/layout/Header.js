@@ -18,7 +18,7 @@ export const Header = ({ isBackButton = false, title = "쇼핑몰" } = {}) => {
             : ""}
           ${isBackButton
             ? /* HTML */ `<h1 class="text-xl font-bold text-gray-900">${title}</h1>`
-            : /* HTML */ `<h1 class="text-xl font-bold text-gray-900"><a href="/" data-link="">${title}</a></h1>`}
+            : /* HTML */ `<h1 class="text-xl font-bold text-gray-900"><a href="./" data-link="">${title}</a></h1>`}
           <div class="flex items-center space-x-2">
             <!-- 장바구니 아이콘 -->
             <button id="cart-icon-btn" class="relative p-2 text-gray-700 hover:text-gray-900 transition-colors">

@@ -70,9 +70,9 @@ export const createRouter = (routes) => {
     if (route) {
       // URL 변경 - replace 옵션에 따라 pushState vs replaceState 선택
       if (options.replace) {
-        window.history.replaceState({}, "", `${BASE_PATH}${fullPath}`);
+        window.history.replaceState({}, "", fullPath);
       } else {
-        window.history.pushState({}, "", `${BASE_PATH}${fullPath}`);
+        window.history.pushState({}, "", fullPath);
       }
 
       currentRoute = route;
